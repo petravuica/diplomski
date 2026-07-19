@@ -1,0 +1,30 @@
+# Virtualna okruženja
+venv/
+env/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django lokalne datoteke
+db.sqlite3
+media/
+staticfiles/
+
+# Tajni podaci i postavke
+.env
+.env.*
+!.env.example
+
+# Uređivači
+.vscode/
+.idea/
+
+# Windows i macOS
+Thumbs.db
+.DS_Store
+
+# Logovi
+*.log

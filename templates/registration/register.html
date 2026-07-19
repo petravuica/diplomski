@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}Registracija | BloodLab AI{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+
+{% block content %}
+<section class="auth-shell">
+    <div class="container app-container">
+        <div class="auth-card auth-card-register">
+            <div class="auth-visual">
+                <div class="visual-glow visual-glow-one"></div>
+                <div class="visual-glow visual-glow-two"></div>
+                <div class="auth-visual-content">
+                    <span class="eyebrow eyebrow-light">Osobni zdravstveni pregled</span>
+                    <h1>Svi nalazi na jednom sigurnom mjestu.</h1>
+                    <p>Otvorite račun i pripremite svoj profil za unos, analizu i praćenje krvnih nalaza.</p>
+                    <div class="feature-list">
+                        <div><span>✓</span><p><strong>Jednostavan unos</strong><small>Brzo zabilježite laboratorijske vrijednosti.</small></p></div>
+                        <div><span>✓</span><p><strong>Pregled kroz vrijeme</strong><small>Pratite promjene ključnih parametara.</small></p></div>
+                        <div><span>✓</span><p><strong>Razumljive preporuke</strong><small>Dobijte jasan sažetak rezultata analize.</small></p></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="auth-form-panel">
+                <div class="auth-form-wrap register-wrap">
+                    <span class="eyebrow">Izradite račun</span>
+                    <h2>Registracija korisnika</h2>
+                    <p class="form-intro">Ispunite podatke za početak korištenja sustava.</p>
+
+                    {% if form.non_field_errors %}
+                        <div class="form-alert" role="alert">{{ form.non_field_errors }}</div>
+                    {% endif %}
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        <div class="form-grid">
+                            <div class="field-group full-width">
+                                <label for="{{ form.username.id_for_label }}">Korisničko ime</label>
+                                {{ form.username }}
+                                {% for error in form.username.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+                            </div>
+                            <div class="field-group full-width">
+                                <label for="{{ form.email.id_for_label }}">E-mail adresa</label>
+                                {{ form.email }}
+                                {% for error in form.email.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+                            </div>
+                            <div class="field-group">
+                                <label for="{{ form.role.id_for_label }}">Uloga</label>
+                                {{ form.role }}
+                                {% for error in form.role.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+                            </div>
+                            <div class="field-group">
+                                <label for="{{ form.age.id_for_label }}">Dob</label>
+                                {{ form.age }}
+                                {% for error in form.age.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+                            </div>
+                            <div class="field-group full-width">
+                                <label for="{{ form.password1.id_for_label }}">Lozinka</label>
+                                {{ form.password1 }}
+                                {% for error in form.password1.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+                            </div>
+                            <div class="field-group full-width">
+                                <label for="{{ form.password2.id_for_label }}">Potvrda lozinke</label>
+                                {{ form.password2 }}
+                                {% for error in form.password2.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+                            </div>
+                        </div>
+                        <button class="btn btn-primary-app w-100 mt-1" type="submit">Registriraj se</button>
+                    </form>
+                    <p class="auth-switch">Već imate račun? <a href="{% url 'login' %}">Prijavite se</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

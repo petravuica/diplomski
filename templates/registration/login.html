@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Prijava | BloodLab AI{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+
+{% block content %}
+<section class="auth-shell">
+    <div class="container app-container">
+        <div class="auth-card">
+            <div class="auth-visual">
+                <div class="visual-glow visual-glow-one"></div>
+                <div class="visual-glow visual-glow-two"></div>
+                <div class="auth-visual-content">
+                    <span class="eyebrow eyebrow-light">Pametnije praćenje zdravlja</span>
+                    <h1>Vaši krvni nalazi, jasnije prikazani.</h1>
+                    <p>Pratite rezultate, uočite promjene i dobijte razumljivo objašnjenje laboratorijskih parametara na jednom mjestu.</p>
+                    <div class="health-illustration" aria-hidden="true">
+                        <div class="report-card">
+                            <div class="report-top"><span></span><span></span></div>
+                            <div class="report-row"><i class="status status-green"></i><b>Hemoglobin</b><em>Uredno</em></div>
+                            <div class="report-row"><i class="status status-red"></i><b>CRP</b><em>Povišeno</em></div>
+                            <div class="report-row"><i class="status status-green"></i><b>Leukociti</b><em>Uredno</em></div>
+                            <div class="report-chart"><span style="height:36%"></span><span style="height:62%"></span><span style="height:48%"></span><span style="height:78%"></span><span style="height:58%"></span></div>
+                        </div>
+                        <div class="pulse-badge"><span>♥</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="auth-form-panel">
+                <div class="auth-form-wrap">
+                    <div class="mobile-brand brand mb-4">
+                        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.8S5.8 9.7 5.8 14.4a6.2 6.2 0 1 0 12.4 0C18.2 9.7 12 2.8 12 2.8Z" fill="currentColor"/></svg></span>
+                        <span>BloodLab <strong>AI</strong></span>
+                    </div>
+                    <span class="eyebrow">Dobro došli natrag</span>
+                    <h2>Prijavite se u svoj račun</h2>
+                    <p class="form-intro">Unesite podatke za pristup nadzornoj ploči.</p>
+
+                    {% if form.non_field_errors %}
+                        <div class="form-alert" role="alert">Korisničko ime ili lozinka nisu ispravni.</div>
+                    {% endif %}
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        <div class="field-group">
+                            <label for="{{ form.username.id_for_label }}">Korisničko ime</label>
+                            {{ form.username }}
+                            {% for error in form.username.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="field-group">
+                            <div class="label-row">
+                                <label for="{{ form.password.id_for_label }}">Lozinka</label>
+                            </div>
+                            {{ form.password }}
+                            {% for error in form.password.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+                        </div>
+                        {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+                        <button class="btn btn-primary-app w-100" type="submit">Prijavi se</button>
+                    </form>
+
+                    <p class="auth-switch">Nemate račun? <a href="{% url 'register' %}">Registrirajte se</a></p>
+                    <div class="privacy-note"><span aria-hidden="true">🔒</span> Vaši podaci zaštićeni su i pohranjuju se sigurno.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

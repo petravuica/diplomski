@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}Nadzorna ploča | BloodLab AI{% endblock %}
+
+{% block content %}
+<section class="dashboard-hero">
+    <div class="container app-container">
+        <div class="welcome-row">
+            <div>
+                <span class="eyebrow">Nadzorna ploča</span>
+                <h1>Dobro došli, {{ user.first_name|default:user.username }}.</h1>
+                <p>Ovdje možete unijeti novi krvni nalaz, pratiti rezultate i pregledati preporuke.</p>
+            </div>
+            <a class="btn btn-primary-app hero-action" href="#">
+                <span class="btn-icon">＋</span> Unesi novi nalaz
+            </a>
+        </div>
+
+        <div class="stats-grid">
+            <article class="stat-card">
+                <div class="stat-icon icon-blue">▤</div>
+                <div><span>Ukupno nalaza</span><strong>0</strong><small>Još nema spremljenih nalaza</small></div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-icon icon-green">✓</div>
+                <div><span>Posljednja analiza</span><strong>—</strong><small>Unesite prvi nalaz</small></div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-icon icon-purple">↗</div>
+                <div><span>Praćeni parametri</span><strong>5</strong><small>Osnovni krvni pokazatelji</small></div>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="dashboard-content">
+    <div class="container app-container">
+        <div class="dashboard-grid">
+            <div class="main-column">
+                <article class="panel-card empty-state-card">
+                    <div class="panel-heading">
+                        <div><span class="eyebrow">Krvni nalazi</span><h2>Nedavni nalazi</h2></div>
+                        <a href="#" class="text-link">Prikaži sve</a>
+                    </div>
+                    <div class="empty-state">
+                        <div class="empty-icon">⌁</div>
+                        <h3>Još nema unesenih nalaza</h3>
+                        <p>Dodajte prvi krvni nalaz kako biste dobili pregled rezultata i preporuke.</p>
+                        <a href="#" class="btn btn-secondary-app">Dodaj prvi nalaz</a>
+                    </div>
+                </article>
+
+                <article class="panel-card mt-4">
+                    <div class="panel-heading">
+                        <div><span class="eyebrow">Brzi pristup</span><h2>Što želite učiniti?</h2></div>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="#" class="quick-card"><span class="quick-icon">＋</span><div><strong>Novi nalaz</strong><small>Unesite laboratorijske vrijednosti</small></div><b>›</b></a>
+                        <a href="#" class="quick-card"><span class="quick-icon">▤</span><div><strong>Povijest nalaza</strong><small>Pregledajte prethodne rezultate</small></div><b>›</b></a>
+                        <a href="#" class="quick-card"><span class="quick-icon">◯</span><div><strong>Korisnički profil</strong><small>Uredite osobne podatke</small></div><b>›</b></a>
+                    </div>
+                </article>
+            </div>
+
+            <aside class="side-column">
+                <article class="panel-card progress-card">
+                    <span class="eyebrow">Početak rada</span>
+                    <h2>Dovršite svoj prvi pregled</h2>
+                    <div class="progress app-progress" role="progressbar" aria-label="Napredak" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:33%"></div></div>
+                    <div class="check-list">
+                        <div class="done"><span>✓</span><p><strong>Korisnički račun</strong><small>Registracija je dovršena</small></p></div>
+                        <div><span>2</span><p><strong>Unos krvnog nalaza</strong><small>Dodajte laboratorijske vrijednosti</small></p></div>
+                        <div><span>3</span><p><strong>Pregled analize</strong><small>Pročitajte rezultate i preporuke</small></p></div>
+                    </div>
+                </article>
+
+                <article class="panel-card info-card mt-4">
+                    <div class="info-symbol">i</div>
+                    <h3>Važna napomena</h3>
+                    <p>BloodLab AI pruža informativnu procjenu. Rezultate uvijek tumačite uz savjet liječnika.</p>
+                </article>
+            </aside>
+        </div>
+    </div>
+</section>
+{% endblock %}
