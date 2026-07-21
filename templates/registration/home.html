@@ -56,7 +56,7 @@
                     <div class="quick-actions">
                         <a href="#" class="quick-card"><span class="quick-icon">＋</span><div><strong>Novi nalaz</strong><small>Unesite laboratorijske vrijednosti</small></div><b>›</b></a>
                         <a href="#" class="quick-card"><span class="quick-icon">▤</span><div><strong>Povijest nalaza</strong><small>Pregledajte prethodne rezultate</small></div><b>›</b></a>
-                        <a href="#" class="quick-card"><span class="quick-icon">◯</span><div><strong>Korisnički profil</strong><small>Uredite osobne podatke</small></div><b>›</b></a>
+                        <a href="{% url 'profile' %}" class="quick-card"><span class="quick-icon">◯</span><div><strong>Korisnički profil</strong><small>Uredite osobne podatke</small></div><b>›</b></a>
                     </div>
                 </article>
             </div>
@@ -65,11 +65,12 @@
                 <article class="panel-card progress-card">
                     <span class="eyebrow">Početak rada</span>
                     <h2>Dovršite svoj prvi pregled</h2>
-                    <div class="progress app-progress" role="progressbar" aria-label="Napredak" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:33%"></div></div>
+                    <div class="progress app-progress" role="progressbar" aria-label="Napredak" aria-valuenow="{{ onboarding_progress }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:{{ onboarding_progress }}%"></div></div>
                     <div class="check-list">
                         <div class="done"><span>✓</span><p><strong>Korisnički račun</strong><small>Registracija je dovršena</small></p></div>
-                        <div><span>2</span><p><strong>Unos krvnog nalaza</strong><small>Dodajte laboratorijske vrijednosti</small></p></div>
-                        <div><span>3</span><p><strong>Pregled analize</strong><small>Pročitajte rezultate i preporuke</small></p></div>
+                        <div class="{% if profile_complete %}done{% endif %}"><span>{% if profile_complete %}✓{% else %}2{% endif %}</span><p><strong>Korisnički profil</strong><small>{% if profile_complete %}Osnovni podaci su uneseni{% else %}<a href="{% url 'profile' %}">Dovršite osobne podatke</a>{% endif %}</small></p></div>
+                        <div><span>3</span><p><strong>Unos krvnog nalaza</strong><small>Dodajte laboratorijske vrijednosti</small></p></div>
+                        <div><span>4</span><p><strong>Pregled analize</strong><small>Pročitajte rezultate i preporuke</small></p></div>
                     </div>
                 </article>
 

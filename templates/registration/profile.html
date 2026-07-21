@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Korisnički profil | BloodLab AI{% endblock %}
+
+{% block content %}
+<section class="profile-hero">
+    <div class="container app-container">
+        <span class="eyebrow">Korisnički račun</span>
+        <h1>Vaš zdravstveni profil</h1>
+        <p>Ovi podaci omogućit će ispravno tumačenje nalaza i izračun dobi na datum uzorkovanja.</p>
+    </div>
+</section>
+
+<section class="profile-content">
+    <div class="container app-container">
+        <div class="profile-layout">
+            <article class="panel-card profile-form-card">
+                <div class="panel-heading profile-heading">
+                    <div>
+                        <span class="eyebrow">Osobni podaci</span>
+                        <h2>Uredite profil</h2>
+                    </div>
+                    {% if profile_complete %}
+                        <span class="profile-status complete">✓ Profil je dovršen</span>
+                    {% else %}
+                        <span class="profile-status incomplete">Profil nije dovršen</span>
+                    {% endif %}
+                </div>
+
+                <form method="post" novalidate class="profile-form">
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}
+                        <div class="form-alert">{{ form.non_field_errors }}</div>
+                    {% endif %}
+
+                    <div class="form-grid profile-grid">
+                        {% for field in form %}
+                            <div class="field-group {% if field.name == 'email' or field.name == 'date_of_birth' %}full-width{% endif %}">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}<span class="required-mark"> *</span>{% endif %}</label>
+                                {{ field }}
+                                {% for error in field.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="profile-actions">
+                        <a href="{% url 'home' %}" class="btn btn-secondary-app">Odustani</a>
+                        <button type="submit" class="btn btn-primary-app">Spremi promjene</button>
+                    </div>
+                </form>
+            </article>
+
+            <aside class="profile-side">
+                <article class="panel-card profile-summary-card">
+                    <div class="profile-avatar-large">{{ user.first_name|default:user.username|first|upper }}</div>
+                    <h2>{{ user.get_full_name|default:user.username }}</h2>
+                    <p>@{{ user.username }}</p>
+                    <div class="profile-meta">
+                        <div><span>Uloga</span><strong>{{ user.get_role_display }}</strong></div>
+                        <div><span>Trenutačna dob</span><strong>{% if calculated_age != None %}{{ calculated_age }} god.{% else %}—{% endif %}</strong></div>
+                    </div>
+                </article>
+
+                <article class="panel-card info-card mt-4">
+                    <div class="info-symbol">i</div>
+                    <h3>Zašto tražimo ove podatke?</h3>
+                    <p>Referentni intervali i interpretacija pojedinih parametara mogu ovisiti o dobi i spolu. Visina i težina zasad su opcionalne.</p>
+                </article>
+            </aside>
+        </div>
+    </div>
+</section>
+{% endblock %}

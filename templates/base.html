@@ -33,13 +33,14 @@
                             <a class="nav-link active" href="{% url 'home' %}">Nadzorna ploča</a>
                             <a class="nav-link" href="#">Novi nalaz</a>
                             <a class="nav-link" href="#">Povijest nalaza</a>
-                            <div class="nav-user ms-lg-3">
+                            <a class="nav-link" href="{% url 'profile' %}">Profil</a>
+                            <a class="nav-user ms-lg-3" href="{% url 'profile' %}" aria-label="Otvori korisnički profil">
                                 <span class="user-avatar">{{ user.username|first|upper }}</span>
                                 <div class="user-copy">
                                     <strong>{{ user.username }}</strong>
                                     <span>{{ user.get_role_display|default:"Korisnik" }}</span>
                                 </div>
-                            </div>
+                            </a>
                             <form class="logout-form" method="post" action="{% url 'logout' %}">
                                 {% csrf_token %}
                                 <button class="btn btn-logout" type="submit" aria-label="Odjava">Odjava</button>

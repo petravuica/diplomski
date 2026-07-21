@@ -44,15 +44,10 @@
                                 {{ form.email }}
                                 {% for error in form.email.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
                             </div>
-                            <div class="field-group">
+                            <div class="field-group full-width">
                                 <label for="{{ form.role.id_for_label }}">Uloga</label>
                                 {{ form.role }}
                                 {% for error in form.role.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
-                            </div>
-                            <div class="field-group">
-                                <label for="{{ form.age.id_for_label }}">Dob</label>
-                                {{ form.age }}
-                                {% for error in form.age.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
                             </div>
                             <div class="field-group full-width">
                                 <label for="{{ form.password1.id_for_label }}">Lozinka</label>
