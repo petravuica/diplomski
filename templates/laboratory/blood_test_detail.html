@@ -5,7 +5,7 @@
 <section class="profile-hero">
     <div class="container app-container detail-hero-row">
         <div>
-            <span class="eyebrow">Spremljeni nalaz</span>
+            <span class="eyebrow">Analizirani nalaz</span>
             <h1>Krvni nalaz od {{ blood_test.sampling_date|date:"d.m.Y." }}</h1>
             <p>Ručni unos · {{ blood_test.results.count }} spremljenih parametara</p>
         </div>
@@ -15,22 +15,24 @@
 
 <section class="profile-content">
     <div class="container app-container">
-        <div class="detail-summary-grid">
-            <article class="stat-card"><div class="stat-icon icon-blue">▤</div><div><span>Datum uzorkovanja</span><strong>{{ blood_test.sampling_date|date:"d.m.Y." }}</strong></div></article>
-            <article class="stat-card"><div class="stat-icon icon-green">#</div><div><span>Broj parametara</span><strong>{{ blood_test.results.count }}</strong></div></article>
-            <article class="stat-card"><div class="stat-icon icon-purple">◯</div><div><span>Dob pri nalazu</span><strong>{{ blood_test.age_at_test|default:"—" }}</strong></div></article>
+        <div class="detail-summary-grid analysis-summary-grid">
+            <article class="stat-card"><div class="stat-icon icon-green">✓</div><div><span>Uredno</span><strong>{{ analysis_summary.normal }}</strong></div></article>
+            <article class="stat-card"><div class="stat-icon icon-orange">↓</div><div><span>Sniženo</span><strong>{{ analysis_summary.low }}</strong></div></article>
+            <article class="stat-card"><div class="stat-icon icon-red">↑</div><div><span>Povišeno</span><strong>{{ analysis_summary.high }}</strong></div></article>
+            <article class="stat-card"><div class="stat-icon icon-gray">?</div><div><span>Bez intervala</span><strong>{{ analysis_summary.unknown }}</strong></div></article>
         </div>
 
         <article class="panel-card mt-4">
             <div class="panel-heading">
                 <div><span class="eyebrow">Rezultati</span><h2>Laboratorijske vrijednosti</h2></div>
+                <div class="test-meta">Dob pri nalazu: <strong>{{ blood_test.age_at_test|default:"—" }}</strong></div>
             </div>
             <div class="parameter-table-wrap">
                 <table class="results-table">
                     <thead><tr><th>Parametar</th><th>Vrijednost</th><th>Jedinica</th><th>Referentni interval</th><th>Status</th></tr></thead>
                     <tbody>
                         {% for result in blood_test.results.all %}
-                            <tr>
+                            <tr class="result-row-{{ result.status }}">
                                 <td><strong>{{ result.parameter_name }}</strong><small>{{ result.parameter_code }}</small></td>
                                 <td>{{ result.display_value }}</td>
                                 <td>{{ result.unit|default:"—" }}</td>
@@ -43,7 +45,17 @@
                                         ≤ {{ result.reference_max|floatformat:"-6" }}
                                     {% else %}—{% endif %}
                                 </td>
-                                <td><span class="result-status status-unknown">Nije analizirano</span></td>
+                                <td>
+                                    {% if result.status == 'normal' %}
+                                        <span class="result-status status-normal">Uredno</span>
+                                    {% elif result.status == 'low' %}
+                                        <span class="result-status status-low">Sniženo</span>
+                                    {% elif result.status == 'high' %}
+                                        <span class="result-status status-high">Povišeno</span>
+                                    {% else %}
+                                        <span class="result-status status-unknown">Nije moguće analizirati</span>
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% empty %}
                             <tr><td colspan="5">Nema spremljenih parametara.</td></tr>
@@ -55,8 +67,8 @@
 
         <article class="panel-card info-card mt-4">
             <div class="info-symbol">i</div>
-            <h3>Analiza referentnih vrijednosti dolazi u sljedećem koraku</h3>
-            <p>Trenutačno se vrijednosti sigurno spremaju i prikazuju. Automatsko označavanje sniženih, urednih i povišenih rezultata dodat ćemo kao zasebnu funkcionalnost.</p>
+            <h3>Kako se određuje status rezultata?</h3>
+            <p>Vrijednost se uspoređuje isključivo s referentnim granicama unesenima s laboratorijskog nalaza. Rezultat bez referentnog intervala označen je kao nepoznat. Ovaj prikaz je informativan i ne predstavlja dijagnozu.</p>
         </article>
     </div>
 </section>

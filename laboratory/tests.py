@@ -110,6 +110,14 @@ class ManualBloodTestViewTests(TestCase):
         self.assertRedirects(response, reverse("laboratory:detail", args=[blood_test.pk]))
         self.assertEqual(blood_test.results.count(), 2)
         self.assertEqual(blood_test.processing_status, BloodTest.ProcessingStatus.COMPLETED)
+        self.assertEqual(
+            blood_test.results.get(parameter_code="HGB").status,
+            BloodTestResult.Status.NORMAL,
+        )
+        self.assertEqual(
+            blood_test.results.get(parameter_code="CRP").status,
+            BloodTestResult.Status.UNKNOWN,
+        )
 
     def test_manual_entry_requires_at_least_one_parameter(self):
         response = self.client.post(
@@ -136,3 +144,45 @@ class ManualBloodTestViewTests(TestCase):
 
         response = self.client.get(reverse("laboratory:detail", args=[blood_test.pk]))
         self.assertEqual(response.status_code, 404)
+
+from .services import ReferenceAnalysisService
+
+
+class ReferenceAnalysisServiceTests(TestCase):
+    def test_status_is_low_below_minimum(self):
+        status = ReferenceAnalysisService.determine_status(
+            Decimal("3.8"), Decimal("4.2"), Decimal("5.4")
+        )
+        self.assertEqual(status, BloodTestResult.Status.LOW)
+
+    def test_status_is_high_above_maximum(self):
+        status = ReferenceAnalysisService.determine_status(
+            Decimal("12"), None, Decimal("5")
+        )
+        self.assertEqual(status, BloodTestResult.Status.HIGH)
+
+    def test_status_is_normal_inside_range(self):
+        status = ReferenceAnalysisService.determine_status(
+            Decimal("132"), Decimal("119"), Decimal("157")
+        )
+        self.assertEqual(status, BloodTestResult.Status.NORMAL)
+
+    def test_status_is_unknown_without_reference_range(self):
+        status = ReferenceAnalysisService.determine_status(
+            Decimal("4.2"), None, None
+        )
+        self.assertEqual(status, BloodTestResult.Status.UNKNOWN)
+
+    def test_inclusive_reference_boundaries_are_normal(self):
+        self.assertEqual(
+            ReferenceAnalysisService.determine_status(
+                Decimal("5"), None, Decimal("5")
+            ),
+            BloodTestResult.Status.NORMAL,
+        )
+        self.assertEqual(
+            ReferenceAnalysisService.determine_status(
+                Decimal("4.2"), Decimal("4.2"), None
+            ),
+            BloodTestResult.Status.NORMAL,
+        )

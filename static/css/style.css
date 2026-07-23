@@ -384,3 +384,24 @@ a { color: var(--blue); }
     .parameter-entry-table td { display: grid; grid-template-columns: 125px 1fr; align-items: center; gap: 10px; min-width: 0 !important; padding: 6px 0; border: 0; }
     .parameter-entry-table td::before { content: attr(data-label); color: var(--muted); font-size: .75rem; font-weight: 700; }
 }
+
+/* Reference range analysis */
+.analysis-summary-grid { grid-template-columns: repeat(4, 1fr); }
+.icon-orange { background: #fff1dc; color: #b96800; }
+.icon-red { background: #ffe6e6; color: #c92a2a; }
+.icon-gray { background: #edf1f6; color: #667085; }
+.status-normal { color: #087443; background: #dcf8e9; }
+.status-low { color: #9a5b00; background: #fff0d5; }
+.status-high { color: #b42318; background: #fee4e2; }
+.result-row-low td:first-child { border-left: 3px solid #d98b16; }
+.result-row-high td:first-child { border-left: 3px solid #d92d20; }
+.result-row-normal td:first-child { border-left: 3px solid #12a564; }
+.test-meta { color: #667085; font-size: .9rem; }
+
+@media (max-width: 900px) {
+    .analysis-summary-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 520px) {
+    .analysis-summary-grid { grid-template-columns: 1fr; }
+}

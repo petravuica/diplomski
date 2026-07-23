@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import LABORATORY_PARAMETERS, ManualBloodTestForm
 from .models import BloodTest, BloodTestResult
+from .services import ReferenceAnalysisService
 
 
 @login_required
@@ -26,12 +27,13 @@ def manual_blood_test_create(request):
                     input_method=BloodTest.InputMethod.MANUAL,
                     processing_status=BloodTest.ProcessingStatus.COMPLETED,
                 )
-                BloodTestResult.objects.bulk_create(
-                    [
-                        BloodTestResult(blood_test=blood_test, **parameter_data)
-                        for parameter_data in form.iter_parameter_data()
-                    ]
-                )
+                results = [
+                    BloodTestResult(blood_test=blood_test, **parameter_data)
+                    for parameter_data in form.iter_parameter_data()
+                ]
+                for result in results:
+                    ReferenceAnalysisService.analyze_result(result, save=False)
+                BloodTestResult.objects.bulk_create(results)
 
             messages.success(request, "Krvni nalaz uspješno je spremljen.")
             return redirect("laboratory:detail", pk=blood_test.pk)
@@ -69,8 +71,12 @@ def blood_test_detail(request, pk):
         pk=pk,
         user=request.user,
     )
+    analysis_summary = ReferenceAnalysisService.analyze_blood_test(blood_test)
     return render(
         request,
         "laboratory/blood_test_detail.html",
-        {"blood_test": blood_test},
+        {
+            "blood_test": blood_test,
+            "analysis_summary": analysis_summary,
+        },
     )
