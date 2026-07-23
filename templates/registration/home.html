@@ -10,7 +10,7 @@
                 <h1>Dobro došli, {{ user.first_name|default:user.username }}.</h1>
                 <p>Ovdje možete unijeti novi krvni nalaz, pratiti rezultate i pregledati preporuke.</p>
             </div>
-            <a class="btn btn-primary-app hero-action" href="#">
+            <a class="btn btn-primary-app hero-action" href="{% url 'laboratory:manual-create' %}">
                 <span class="btn-icon">＋</span> Unesi novi nalaz
             </a>
         </div>
@@ -18,15 +18,15 @@
         <div class="stats-grid">
             <article class="stat-card">
                 <div class="stat-icon icon-blue">▤</div>
-                <div><span>Ukupno nalaza</span><strong>0</strong><small>Još nema spremljenih nalaza</small></div>
+                <div><span>Ukupno nalaza</span><strong>{{ total_blood_tests }}</strong><small>{% if total_blood_tests %}Spremljeni krvni nalazi{% else %}Još nema spremljenih nalaza{% endif %}</small></div>
             </article>
             <article class="stat-card">
                 <div class="stat-icon icon-green">✓</div>
-                <div><span>Posljednja analiza</span><strong>—</strong><small>Unesite prvi nalaz</small></div>
+                <div><span>Posljednji nalaz</span><strong>{% if latest_blood_test %}{{ latest_blood_test.sampling_date|date:"d.m.Y." }}{% else %}—{% endif %}</strong><small>{% if latest_blood_test %}{{ latest_blood_test.results.count }} parametara{% else %}Unesite prvi nalaz{% endif %}</small></div>
             </article>
             <article class="stat-card">
                 <div class="stat-icon icon-purple">↗</div>
-                <div><span>Praćeni parametri</span><strong>5</strong><small>Osnovni krvni pokazatelji</small></div>
+                <div><span>Praćeni parametri</span><strong>{% if latest_blood_test %}{{ latest_blood_test.results.count }}{% else %}15{% endif %}</strong><small>{% if latest_blood_test %}U posljednjem nalazu{% else %}Dostupno za ručni unos{% endif %}</small></div>
             </article>
         </div>
     </div>
@@ -41,12 +41,23 @@
                         <div><span class="eyebrow">Krvni nalazi</span><h2>Nedavni nalazi</h2></div>
                         <a href="#" class="text-link">Prikaži sve</a>
                     </div>
-                    <div class="empty-state">
-                        <div class="empty-icon">⌁</div>
-                        <h3>Još nema unesenih nalaza</h3>
-                        <p>Dodajte prvi krvni nalaz kako biste dobili pregled rezultata i preporuke.</p>
-                        <a href="#" class="btn btn-secondary-app">Dodaj prvi nalaz</a>
-                    </div>
+                    {% if recent_blood_tests %}
+                        <div class="recent-tests-list">
+                            {% for blood_test in recent_blood_tests %}
+                                <a class="recent-test-row" href="{% url 'laboratory:detail' blood_test.pk %}">
+                                    <div><strong>{{ blood_test.sampling_date|date:"d.m.Y." }}</strong><small>{{ blood_test.get_input_method_display }}</small></div>
+                                    <span>{{ blood_test.results.count }} parametara</span><b>›</b>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <div class="empty-icon">⌁</div>
+                            <h3>Još nema unesenih nalaza</h3>
+                            <p>Dodajte prvi krvni nalaz kako biste dobili pregled rezultata i preporuke.</p>
+                            <a href="{% url 'laboratory:manual-create' %}" class="btn btn-secondary-app">Dodaj prvi nalaz</a>
+                        </div>
+                    {% endif %}
                 </article>
 
                 <article class="panel-card mt-4">
@@ -54,7 +65,7 @@
                         <div><span class="eyebrow">Brzi pristup</span><h2>Što želite učiniti?</h2></div>
                     </div>
                     <div class="quick-actions">
-                        <a href="#" class="quick-card"><span class="quick-icon">＋</span><div><strong>Novi nalaz</strong><small>Unesite laboratorijske vrijednosti</small></div><b>›</b></a>
+                        <a href="{% url 'laboratory:manual-create' %}" class="quick-card"><span class="quick-icon">＋</span><div><strong>Novi nalaz</strong><small>Unesite laboratorijske vrijednosti</small></div><b>›</b></a>
                         <a href="#" class="quick-card"><span class="quick-icon">▤</span><div><strong>Povijest nalaza</strong><small>Pregledajte prethodne rezultate</small></div><b>›</b></a>
                         <a href="{% url 'profile' %}" class="quick-card"><span class="quick-icon">◯</span><div><strong>Korisnički profil</strong><small>Uredite osobne podatke</small></div><b>›</b></a>
                     </div>
@@ -69,7 +80,7 @@
                     <div class="check-list">
                         <div class="done"><span>✓</span><p><strong>Korisnički račun</strong><small>Registracija je dovršena</small></p></div>
                         <div class="{% if profile_complete %}done{% endif %}"><span>{% if profile_complete %}✓{% else %}2{% endif %}</span><p><strong>Korisnički profil</strong><small>{% if profile_complete %}Osnovni podaci su uneseni{% else %}<a href="{% url 'profile' %}">Dovršite osobne podatke</a>{% endif %}</small></p></div>
-                        <div><span>3</span><p><strong>Unos krvnog nalaza</strong><small>Dodajte laboratorijske vrijednosti</small></p></div>
+                        <div class="{% if latest_blood_test %}done{% endif %}"><span>{% if latest_blood_test %}✓{% else %}3{% endif %}</span><p><strong>Unos krvnog nalaza</strong><small>{% if latest_blood_test %}Prvi nalaz je spremljen{% else %}Dodajte laboratorijske vrijednosti{% endif %}</small></p></div>
                         <div><span>4</span><p><strong>Pregled analize</strong><small>Pročitajte rezultate i preporuke</small></p></div>
                     </div>
                 </article>

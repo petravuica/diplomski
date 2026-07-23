@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}Novi krvni nalaz | BloodLab AI{% endblock %}
+
+{% block content %}
+<section class="profile-hero">
+    <div class="container app-container">
+        <span class="eyebrow">Ručni unos</span>
+        <h1>Novi krvni nalaz</h1>
+        <p>Unesite datum uzorkovanja i vrijednosti koje se nalaze na laboratorijskom nalazu. Nije potrebno ispuniti sva polja.</p>
+    </div>
+</section>
+
+<section class="profile-content">
+    <div class="container app-container">
+        <form method="post" class="blood-test-form" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="form-alert" role="alert">
+                    {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+                </div>
+            {% endif %}
+
+            <article class="panel-card mb-4">
+                <div class="panel-heading form-section-heading">
+                    <div><span class="eyebrow">Osnovni podaci</span><h2>Podaci o nalazu</h2></div>
+                </div>
+                <div class="sampling-field">
+                    <label class="form-label" for="{{ form.sampling_date.id_for_label }}">{{ form.sampling_date.label }}</label>
+                    {{ form.sampling_date }}
+                    {% for error in form.sampling_date.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+                </div>
+            </article>
+
+            {% for group in parameter_groups %}
+                <article class="panel-card mb-4">
+                    <div class="panel-heading form-section-heading">
+                        <div><span class="eyebrow">Laboratorijski parametri</span><h2>{{ group.name }}</h2></div>
+                    </div>
+                    <div class="parameter-table-wrap">
+                        <table class="parameter-entry-table">
+                            <thead>
+                                <tr>
+                                    <th>Parametar</th>
+                                    <th>Vrijednost</th>
+                                    <th>Jedinica</th>
+                                    <th>Referentno od</th>
+                                    <th>Referentno do</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for parameter in group.parameters %}
+                                    <tr>
+                                        <td data-label="Parametar"><strong>{{ parameter.name }}</strong><small>{{ parameter.code }}</small></td>
+                                        <td data-label="Vrijednost">
+                                            {{ parameter.value_field }}
+                                            {% for error in parameter.value_field.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+                                        </td>
+                                        <td data-label="Jedinica">
+                                            {{ parameter.unit_field }}
+                                            {% for error in parameter.unit_field.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+                                        </td>
+                                        <td data-label="Referentno od">
+                                            {{ parameter.reference_min_field }}
+                                            {% for error in parameter.reference_min_field.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+                                        </td>
+                                        <td data-label="Referentno do">
+                                            {{ parameter.reference_max_field }}
+                                            {% for error in parameter.reference_max_field.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+            {% endfor %}
+
+            <div class="form-actions-row">
+                <a class="btn btn-light-app" href="{% url 'home' %}">Odustani</a>
+                <button class="btn btn-primary-app" type="submit">Spremi krvni nalaz</button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

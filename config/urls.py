@@ -9,6 +9,7 @@ from users.forms import StyledAuthenticationForm
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("users.urls")),
+    path("blood-tests/", include("laboratory.urls")),
     path(
         "accounts/login/",
         auth_views.LoginView.as_view(

@@ -345,3 +345,42 @@ a { color: var(--blue); }
     .profile-actions { flex-direction: column-reverse; }
     .profile-actions .btn { width: 100%; }
 }
+
+/* Manual blood test entry and details */
+.blood-test-form { max-width: 1180px; margin: 0 auto; }
+.form-section-heading { align-items: center; }
+.sampling-field { max-width: 320px; padding-top: 22px; }
+.parameter-table-wrap { overflow-x: auto; margin-top: 20px; }
+.parameter-entry-table, .results-table { width: 100%; border-collapse: collapse; }
+.parameter-entry-table th, .results-table th { padding: 12px 10px; color: #697586; background: #f7f9fc; border-bottom: 1px solid var(--line); font-size: .76rem; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+.parameter-entry-table td, .results-table td { padding: 13px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.parameter-entry-table td:first-child { min-width: 230px; }
+.parameter-entry-table td:not(:first-child) { min-width: 140px; }
+.parameter-entry-table td strong, .results-table td strong { display: block; color: var(--navy); font-size: .9rem; }
+.parameter-entry-table td small, .results-table td small { display: block; margin-top: .2rem; color: var(--muted); font-size: .74rem; }
+.parameter-entry-table .form-control { min-width: 112px; }
+.form-actions-row { display: flex; justify-content: flex-end; gap: 12px; margin-top: 8px; }
+.btn-light-app { padding: .75rem 1.15rem; color: var(--navy); background: white; border: 1px solid var(--line); border-radius: 12px; font-weight: 700; }
+.detail-hero-row { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.detail-summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.result-status { display: inline-flex; padding: .4rem .65rem; border-radius: 999px; font-size: .75rem; font-weight: 800; white-space: nowrap; }
+.status-unknown { color: #667085; background: #edf1f6; }
+.recent-tests-list { display: grid; padding-top: 10px; }
+.recent-test-row { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 18px; padding: 16px 4px; color: inherit; text-decoration: none; border-bottom: 1px solid var(--line); }
+.recent-test-row:hover strong { color: var(--blue); }
+.recent-test-row div { display: grid; }
+.recent-test-row strong { color: var(--navy); }
+.recent-test-row small, .recent-test-row span { color: var(--muted); font-size: .82rem; }
+.recent-test-row b { color: #91a0b4; font-size: 1.5rem; font-weight: 400; }
+
+@media (max-width: 767.98px) {
+    .detail-hero-row { align-items: flex-start; flex-direction: column; }
+    .detail-summary-grid { grid-template-columns: 1fr; }
+    .form-actions-row { flex-direction: column-reverse; }
+    .form-actions-row .btn { width: 100%; }
+    .parameter-entry-table thead { display: none; }
+    .parameter-entry-table, .parameter-entry-table tbody, .parameter-entry-table tr, .parameter-entry-table td { display: block; width: 100%; }
+    .parameter-entry-table tr { padding: 14px 0; border-bottom: 1px solid var(--line); }
+    .parameter-entry-table td { display: grid; grid-template-columns: 125px 1fr; align-items: center; gap: 10px; min-width: 0 !important; padding: 6px 0; border: 0; }
+    .parameter-entry-table td::before { content: attr(data-label); color: var(--muted); font-size: .75rem; font-weight: 700; }
+}
