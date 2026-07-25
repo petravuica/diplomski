@@ -9,9 +9,177 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from .forms import LABORATORY_PARAMETERS, ManualBloodTestForm
+from .forms import (
+    LABORATORY_PARAMETERS,
+    ManualBloodTestForm,
+    PdfBloodTestUploadForm,
+    PdfReviewMetadataForm,
+    PdfResultReviewFormSet,
+)
 from .models import BloodTest, BloodTestResult
+from .pdf_parser import LaboratoryPdfParser, PdfParsingError
 from .services import ReferenceAnalysisService
+
+
+@login_required
+def pdf_blood_test_upload(request):
+    if not request.user.profile_is_complete:
+        messages.warning(
+            request,
+            "Prije učitavanja nalaza dovršite profil kako bi se dob i spol ispravno spremili uz nalaz.",
+        )
+        return redirect("profile")
+
+    if request.method == "POST":
+        form = PdfBloodTestUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            uploaded_file = form.cleaned_data["source_file"]
+            try:
+                parsed_report = LaboratoryPdfParser.parse(uploaded_file)
+            except PdfParsingError as exc:
+                form.add_error("source_file", str(exc))
+            else:
+                if not parsed_report.results:
+                    form.add_error(
+                        "source_file",
+                        "Nije prepoznat nijedan krvni parametar. Pokušajte s drugim PDF-om ili upotrijebite ručni unos.",
+                    )
+                    return render(request, "laboratory/pdf_blood_test_upload.html", {"form": form})
+                sampling_date = parsed_report.sampling_date or timezone.localdate()
+                with transaction.atomic():
+                    blood_test = BloodTest.objects.create(
+                        user=request.user,
+                        sampling_date=sampling_date,
+                        input_method=BloodTest.InputMethod.PDF,
+                        source_file=uploaded_file,
+                        processing_status=BloodTest.ProcessingStatus.PENDING_REVIEW,
+                    )
+                    pending_results = []
+                    for item in parsed_report.results:
+                        result = BloodTestResult(
+                            blood_test=blood_test,
+                            parameter_code=item.parameter_code,
+                            parameter_name=item.parameter_name,
+                            numeric_value=item.numeric_value,
+                            text_value=item.text_value,
+                            unit=item.unit,
+                            reference_min=item.reference_min,
+                            reference_max=item.reference_max,
+                            reference_text=item.reference_text,
+                        )
+                        ReferenceAnalysisService.analyze_result(result, save=False)
+                        pending_results.append(result)
+                    if pending_results:
+                        BloodTestResult.objects.bulk_create(pending_results)
+
+                # Demographic discrepancies are warnings only; profile data is never overwritten.
+                if parsed_report.birth_date and request.user.date_of_birth:
+                    if parsed_report.birth_date != request.user.date_of_birth:
+                        messages.warning(
+                            request,
+                            "Datum rođenja u PDF-u razlikuje se od datuma u profilu. Provjerite je li dokument vaš.",
+                        )
+                if parsed_report.gender and request.user.gender:
+                    if parsed_report.gender != request.user.gender:
+                        messages.warning(
+                            request,
+                            "Spol naveden u PDF-u razlikuje se od podatka u profilu.",
+                        )
+                for warning in parsed_report.warnings:
+                    messages.warning(request, warning)
+                messages.info(
+                    request,
+                    f"Prepoznato je {len(parsed_report.results)} parametara. Provjerite podatke prije spremanja.",
+                )
+                return redirect("laboratory:pdf-review", pk=blood_test.pk)
+    else:
+        form = PdfBloodTestUploadForm()
+
+    return render(request, "laboratory/pdf_blood_test_upload.html", {"form": form})
+
+
+@login_required
+def pdf_blood_test_review(request, pk):
+    blood_test = get_object_or_404(
+        BloodTest.objects.prefetch_related("results"),
+        pk=pk,
+        user=request.user,
+        input_method=BloodTest.InputMethod.PDF,
+    )
+    if blood_test.processing_status == BloodTest.ProcessingStatus.COMPLETED:
+        return redirect("laboratory:detail", pk=blood_test.pk)
+
+    existing_results = list(blood_test.results.all())
+    initial_rows = [
+        {
+            "include": True,
+            "parameter_code": result.parameter_code,
+            "parameter_name": result.parameter_name,
+            "numeric_value": result.numeric_value,
+            "text_value": result.text_value,
+            "unit": result.unit,
+            "reference_min": result.reference_min,
+            "reference_max": result.reference_max,
+            "reference_text": result.reference_text,
+        }
+        for result in existing_results
+    ]
+
+    if request.method == "POST":
+        metadata_form = PdfReviewMetadataForm(request.POST)
+        formset = PdfResultReviewFormSet(request.POST, prefix="results")
+        if metadata_form.is_valid() and formset.is_valid():
+            included_rows = [
+                row.cleaned_data for row in formset
+                if row.cleaned_data and row.cleaned_data.get("include")
+            ]
+            codes = [row["parameter_code"].strip().upper() for row in included_rows]
+            if not included_rows:
+                formset._non_form_errors = formset.error_class(["Odaberite barem jedan rezultat za spremanje."])
+            elif len(codes) != len(set(codes)):
+                formset._non_form_errors = formset.error_class(["Svaki parametar smije se pojaviti samo jednom."])
+            else:
+                with transaction.atomic():
+                    blood_test.sampling_date = metadata_form.cleaned_data["sampling_date"]
+                    blood_test.age_at_test = request.user.age_on(blood_test.sampling_date)
+                    blood_test.gender_at_test = request.user.gender
+                    blood_test.processing_status = BloodTest.ProcessingStatus.COMPLETED
+                    blood_test.save()
+                    blood_test.results.all().delete()
+
+                    final_results = []
+                    for row in included_rows:
+                        result = BloodTestResult(
+                            blood_test=blood_test,
+                            parameter_code=row["parameter_code"].strip().upper(),
+                            parameter_name=row["parameter_name"].strip(),
+                            numeric_value=row.get("numeric_value"),
+                            text_value=row.get("text_value", "").strip(),
+                            unit=row.get("unit", "").strip(),
+                            reference_min=row.get("reference_min"),
+                            reference_max=row.get("reference_max"),
+                            reference_text=row.get("reference_text", "").strip(),
+                        )
+                        ReferenceAnalysisService.analyze_result(result, save=False)
+                        final_results.append(result)
+                    BloodTestResult.objects.bulk_create(final_results)
+
+                messages.success(request, "PDF nalaz provjeren je i uspješno spremljen.")
+                return redirect("laboratory:detail", pk=blood_test.pk)
+    else:
+        metadata_form = PdfReviewMetadataForm(initial={"sampling_date": blood_test.sampling_date})
+        formset = PdfResultReviewFormSet(initial=initial_rows, prefix="results")
+
+    return render(
+        request,
+        "laboratory/pdf_blood_test_review.html",
+        {
+            "blood_test": blood_test,
+            "metadata_form": metadata_form,
+            "formset": formset,
+            "recognized_count": len(existing_results),
+        },
+    )
 
 
 @login_required

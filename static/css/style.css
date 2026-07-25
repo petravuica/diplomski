@@ -507,3 +507,84 @@ a { color: var(--blue); }
     .trend-chart-wrap { height: 340px; }
     .trend-change { max-width: none; text-align: left; margin-top: 10px; }
 }
+
+/* PDF upload and review */
+.narrow-container { max-width: 920px; }
+.pdf-upload-card { padding: 2rem; }
+.upload-dropzone {
+    border: 1.5px dashed #b7c8d8;
+    border-radius: 18px;
+    padding: 2rem;
+    text-align: center;
+    background: #f8fbfd;
+}
+.upload-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1rem;
+    display: grid;
+    place-items: center;
+    border-radius: 18px;
+    background: #e9f5f7;
+    color: #166b75;
+    font-weight: 800;
+    letter-spacing: .05em;
+}
+.upload-dropzone .form-control { max-width: 620px; margin: .75rem auto 0; }
+.privacy-note {
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    margin-top: 1.25rem;
+    padding: 1rem 1.1rem;
+    border-radius: 14px;
+    background: #f4f7fa;
+    color: #4b5f70;
+}
+.privacy-note strong { color: #243b4a; }
+.parser-info-card { margin-top: 1rem; padding: 1.4rem 1.6rem; }
+.parser-info-card h2 { font-size: 1rem; margin-bottom: .35rem; }
+.parser-info-card p { margin: 0; color: #607282; }
+.review-heading { align-items: end; }
+.review-meta-card { padding: 1.35rem 1.5rem; margin-bottom: 1rem; }
+.review-meta-grid { display: grid; grid-template-columns: minmax(230px, .5fr) 1fr; gap: 2rem; align-items: end; }
+.review-tip { display: flex; flex-direction: column; gap: .2rem; color: #607282; }
+.review-tip strong { color: #263d4c; }
+.review-table-card { padding: 0; overflow: hidden; }
+.pdf-review-table { margin: 0; min-width: 1180px; }
+.pdf-review-table th {
+    white-space: nowrap;
+    background: #f5f8fa;
+    color: #536777;
+    font-size: .77rem;
+    text-transform: uppercase;
+    letter-spacing: .035em;
+    padding: .9rem .75rem;
+}
+.pdf-review-table td { padding: .75rem; vertical-align: top; }
+.pdf-review-table .form-control { min-width: 105px; }
+.pdf-review-table .parameter-cell { min-width: 250px; }
+.pdf-review-table .parameter-cell .form-control:first-child { width: 90px; margin-bottom: .4rem; font-weight: 700; }
+.pdf-review-table .include-cell { text-align: center; padding-top: 1rem; }
+.review-result-row:has(.include-cell input:not(:checked)) { opacity: .55; }
+.review-disclaimer {
+    margin: 1rem 0;
+    padding: .9rem 1rem;
+    border-left: 4px solid #e6a23c;
+    background: #fff9ed;
+    color: #6e5832;
+    border-radius: 8px;
+}
+.sticky-review-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    padding: 1rem 0;
+    background: linear-gradient(to top, #f6f8fa 75%, rgba(246, 248, 250, 0));
+}
+@media (max-width: 767.98px) {
+    .pdf-upload-card { padding: 1.15rem; }
+    .upload-dropzone { padding: 1.25rem; }
+    .review-meta-grid { grid-template-columns: 1fr; gap: 1rem; }
+    .review-heading { align-items: start; }
+}

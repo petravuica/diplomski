@@ -160,7 +160,7 @@ class BloodTestResult(models.Model):
                 name="unique_parameter_per_blood_test",
             ),
             models.CheckConstraint(
-                condition=(
+                check=(
                     models.Q(numeric_value__isnull=False)
                     | ~models.Q(text_value="")
                 ),

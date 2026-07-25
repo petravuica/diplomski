@@ -335,3 +335,29 @@ class LaboratoryTrendsViewTests(TestCase):
         response = self.client.get(reverse("laboratory:trends"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Nema dovoljno podataka")
+
+
+class LaboratoryPdfParserTests(TestCase):
+    def test_parser_recognizes_common_cbc_row(self):
+        from laboratory.pdf_parser import LaboratoryPdfParser
+
+        parsed = LaboratoryPdfParser._parse_result_line(
+            "(vk)Hemoglobin 129 g/L 119 - 157"
+        )
+
+        self.assertIsNotNone(parsed)
+        self.assertEqual(parsed.parameter_code, "HGB")
+        self.assertEqual(parsed.numeric_value, Decimal("129"))
+        self.assertEqual(parsed.reference_min, Decimal("119"))
+        self.assertEqual(parsed.reference_max, Decimal("157"))
+
+    def test_parser_recognizes_one_sided_reference_limit(self):
+        from laboratory.pdf_parser import LaboratoryPdfParser
+
+        parsed = LaboratoryPdfParser._parse_result_line(
+            "(S) Kolesterol 5.2 H mmol/L preporuka < 5.0"
+        )
+
+        self.assertEqual(parsed.parameter_code, "CHOL")
+        self.assertIsNone(parsed.reference_min)
+        self.assertEqual(parsed.reference_max, Decimal("5.0"))

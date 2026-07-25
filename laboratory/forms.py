@@ -136,3 +136,94 @@ class ManualBloodTestForm(forms.Form):
                     "reference_min": self.cleaned_data.get(f"reference_min_{code}"),
                     "reference_max": self.cleaned_data.get(f"reference_max_{code}"),
                 }
+
+
+class PdfBloodTestUploadForm(forms.Form):
+    source_file = forms.FileField(
+        label="PDF nalaz",
+        widget=forms.ClearableFileInput(
+            attrs={"class": "form-control", "accept": "application/pdf,.pdf"}
+        ),
+        help_text="Najveća dopuštena veličina je 10 MB. Podržani su PDF-ovi s čitljivim tekstom.",
+    )
+
+    MAX_FILE_SIZE = 10 * 1024 * 1024
+
+    def clean_source_file(self):
+        uploaded_file = self.cleaned_data["source_file"]
+        if uploaded_file.size > self.MAX_FILE_SIZE:
+            raise forms.ValidationError("PDF može imati najviše 10 MB.")
+        if not uploaded_file.name.lower().endswith(".pdf"):
+            raise forms.ValidationError("Odaberite datoteku u PDF formatu.")
+        signature = uploaded_file.read(5)
+        uploaded_file.seek(0)
+        if signature != b"%PDF-":
+            raise forms.ValidationError("Datoteka nema valjani PDF potpis.")
+        return uploaded_file
+
+
+class PdfReviewMetadataForm(forms.Form):
+    sampling_date = forms.DateField(
+        label="Datum uzorkovanja",
+        widget=forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+    )
+
+    def clean_sampling_date(self):
+        sampling_date = self.cleaned_data["sampling_date"]
+        if sampling_date > date.today():
+            raise forms.ValidationError("Datum uzorkovanja ne može biti u budućnosti.")
+        return sampling_date
+
+
+class PdfResultReviewForm(forms.Form):
+    include = forms.BooleanField(required=False, initial=True, label="Spremi")
+    parameter_code = forms.CharField(
+        label="Šifra", max_length=50, widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    parameter_name = forms.CharField(
+        label="Parametar", max_length=150, widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    numeric_value = forms.DecimalField(
+        label="Vrijednost", required=False, max_digits=14, decimal_places=6,
+        widget=forms.NumberInput(attrs={"class": "form-control", "step": "any"}),
+    )
+    text_value = forms.CharField(
+        label="Tekstualna vrijednost", required=False, max_length=255,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+    unit = forms.CharField(
+        label="Jedinica", required=False, max_length=50,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+    reference_min = forms.DecimalField(
+        label="Od", required=False, max_digits=14, decimal_places=6,
+        widget=forms.NumberInput(attrs={"class": "form-control", "step": "any"}),
+    )
+    reference_max = forms.DecimalField(
+        label="Do", required=False, max_digits=14, decimal_places=6,
+        widget=forms.NumberInput(attrs={"class": "form-control", "step": "any"}),
+    )
+    reference_text = forms.CharField(
+        label="Izvorni interval", required=False, max_length=255,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not cleaned_data.get("include"):
+            return cleaned_data
+        if cleaned_data.get("numeric_value") is None and not cleaned_data.get("text_value", "").strip():
+            raise forms.ValidationError("Unesite brojčanu ili tekstualnu vrijednost.")
+        lower = cleaned_data.get("reference_min")
+        upper = cleaned_data.get("reference_max")
+        if lower is not None and upper is not None and lower > upper:
+            raise forms.ValidationError("Donja granica ne može biti veća od gornje.")
+        return cleaned_data
+
+
+PdfResultReviewFormSet = forms.formset_factory(
+    PdfResultReviewForm,
+    extra=0,
+    min_num=1,
+    validate_min=True,
+)

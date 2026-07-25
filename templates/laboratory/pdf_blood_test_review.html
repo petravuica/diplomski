@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Provjera PDF nalaza | BloodLab AI{% endblock %}
+{% block body_class %}pdf-review-page{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container app-container">
+        <div class="page-heading review-heading">
+            <div>
+                <span class="eyebrow">Korak 2 od 2</span>
+                <h1>Provjerite prepoznate podatke</h1>
+                <p>Prepoznato je {{ recognized_count }} parametara. Ispravite samo ono što se ne podudara s izvornim nalazom.</p>
+            </div>
+            {% if blood_test.source_file %}
+                <a class="btn btn-secondary-app" href="{{ blood_test.source_file.url }}" target="_blank" rel="noopener">Otvori izvorni PDF</a>
+            {% endif %}
+        </div>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="app-card review-meta-card">
+                <div class="review-meta-grid">
+                    <div>
+                        <label class="form-label" for="{{ metadata_form.sampling_date.id_for_label }}">{{ metadata_form.sampling_date.label }}</label>
+                        {{ metadata_form.sampling_date }}
+                        {% for error in metadata_form.sampling_date.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="review-tip">
+                        <strong>Što provjeriti?</strong>
+                        <span>Datum uzorkovanja, decimalni zarez/točku, jedinicu i referentni interval.</span>
+                    </div>
+                </div>
+            </div>
+
+            {{ formset.management_form }}
+            {% if formset.non_form_errors %}
+                <div class="alert alert-danger">{{ formset.non_form_errors }}</div>
+            {% endif %}
+
+            <div class="app-card review-table-card">
+                <div class="table-responsive">
+                    <table class="table pdf-review-table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Spremi</th><th>Šifra i parametar</th><th>Vrijednost</th><th>Jedinica</th><th>Referentno od</th><th>Referentno do</th><th>Izvorni interval</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in formset %}
+                            <tr class="review-result-row">
+                                <td class="include-cell">{{ row.include }}</td>
+                                <td class="parameter-cell">
+                                    {{ row.parameter_code }}
+                                    {{ row.parameter_name }}
+                                    {% for error in row.parameter_code.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                                    {% for error in row.parameter_name.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                                </td>
+                                <td>
+                                    {{ row.numeric_value }}
+                                    {% if row.text_value.value %}<div class="mt-1">{{ row.text_value }}</div>{% else %}<div class="visually-hidden">{{ row.text_value }}</div>{% endif %}
+                                    {% for error in row.numeric_value.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                                    {% for error in row.non_field_errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                                </td>
+                                <td>{{ row.unit }}</td>
+                                <td>{{ row.reference_min }}</td>
+                                <td>{{ row.reference_max }}</td>
+                                <td>{{ row.reference_text }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="review-disclaimer">
+                Automatsko prepoznavanje može pogriješiti. Konačnim spremanjem potvrđujete da ste podatke usporedili s izvornim PDF nalazom.
+            </div>
+            <div class="form-actions sticky-review-actions">
+                <a class="btn btn-secondary-app" href="{% url 'laboratory:delete' blood_test.pk %}?next={% url 'laboratory:history' %}">Odustani i ukloni nacrt</a>
+                <button class="btn btn-primary-app" type="submit">Potvrdi i spremi nalaz</button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Učitaj PDF nalaz | BloodLab AI{% endblock %}
+{% block body_class %}pdf-upload-page{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container app-container narrow-container">
+        <div class="page-heading">
+            <div>
+                <span class="eyebrow">Automatski unos</span>
+                <h1>Učitaj PDF krvnog nalaza</h1>
+                <p>Sustav će izdvojiti datum, parametre, vrijednosti, jedinice i referentne intervale. Sve ćete provjeriti prije konačnog spremanja.</p>
+            </div>
+        </div>
+
+        <div class="app-card pdf-upload-card">
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+                <div class="upload-dropzone">
+                    <div class="upload-icon" aria-hidden="true">PDF</div>
+                    <label class="form-label" for="{{ form.source_file.id_for_label }}">{{ form.source_file.label }}</label>
+                    {{ form.source_file }}
+                    {% if form.source_file.help_text %}<div class="form-text">{{ form.source_file.help_text }}</div>{% endif %}
+                    {% for error in form.source_file.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                </div>
+
+                <div class="privacy-note">
+                    <strong>Prije spremanja uvijek slijedi provjera.</strong>
+                    <span>Izvorni laboratorijski referentni intervali imaju prednost. Profil se neće automatski mijenjati podacima iz PDF-a.</span>
+                </div>
+
+                <div class="form-actions">
+                    <a class="btn btn-secondary-app" href="{% url 'home' %}">Odustani</a>
+                    <button class="btn btn-primary-app" type="submit">Učitaj i prepoznaj podatke</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="app-card parser-info-card">
+            <h2>Za najbolju točnost</h2>
+            <p>Učitajte izvorni PDF dobiven od laboratorija, a ne fotografiju ili skenirani ispis. Skenirani dokumenti bez tekstualnog sloja zasad zahtijevaju ručni unos.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

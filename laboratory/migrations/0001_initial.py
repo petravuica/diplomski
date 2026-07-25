@@ -75,6 +75,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='bloodtestresult',
-            constraint=models.CheckConstraint(condition=models.Q(('numeric_value__isnull', False), models.Q(('text_value', ''), _negated=True), _connector='OR'), name='blood_result_has_value'),
+            constraint=models.CheckConstraint(check=models.Q(('numeric_value__isnull', False), models.Q(('text_value', ''), _negated=True), _connector='OR'), name='blood_result_has_value'),
         ),
     ]
