@@ -476,3 +476,34 @@ a { color: var(--blue); }
     .delete-actions { flex-direction: column; }
     .delete-actions .btn, .delete-actions form, .delete-actions button { width: 100%; }
 }
+
+/* Laboratory trends */
+.trend-filter-card { margin-bottom: 24px; }
+.trend-filter-form { display: grid; grid-template-columns: minmax(0, 2fr) minmax(210px, .7fr); gap: 20px; align-items: end; }
+.trend-filter-main { min-width: 0; }
+.trend-stat-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.trend-stat-grid .stat-card strong small { font-size: .72rem; font-weight: 600; color: var(--text-muted, #6b7280); }
+.icon-blue { background: #e8f1ff; color: #2563eb; }
+.trend-chart-card { overflow: hidden; }
+.trend-chart-wrap { position: relative; height: 420px; margin-top: 12px; }
+.trend-chart-note { margin: 16px 0 0; color: #667085; font-size: .88rem; }
+.trend-change { max-width: 360px; padding: 10px 13px; border-radius: 12px; background: #f5f7fa; color: #475467; font-size: .88rem; text-align: right; }
+.trend-up strong { color: #c2410c; }
+.trend-down strong { color: #1d4ed8; }
+.trend-empty-card { text-align: center; padding: 54px 24px; }
+.trend-empty-card h2 { margin: 14px 0 8px; }
+.trend-empty-card p { max-width: 590px; margin: 0 auto 22px; color: #667085; }
+.empty-state-icon { width: 58px; height: 58px; margin: 0 auto; display: grid; place-items: center; border-radius: 18px; background: #eef4ff; color: #3157c8; font-size: 1.8rem; font-weight: 700; }
+.trend-results-table td:last-child { text-align: right; white-space: nowrap; }
+.history-open-link { font-weight: 700; text-decoration: none; color: #3157c8; }
+.history-open-link:hover { text-decoration: underline; }
+
+@media (max-width: 992px) {
+    .trend-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 700px) {
+    .trend-filter-form { grid-template-columns: 1fr; }
+    .trend-stat-grid { grid-template-columns: 1fr; }
+    .trend-chart-wrap { height: 340px; }
+    .trend-change { max-width: none; text-align: left; margin-top: 10px; }
+}

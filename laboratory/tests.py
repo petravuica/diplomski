@@ -264,3 +264,74 @@ class BloodTestHistoryViewTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
         self.assertTrue(BloodTest.objects.filter(pk=self.other_test.pk).exists())
+
+
+class LaboratoryTrendsViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="trend-user",
+            password="test-password",
+            role="patient",
+            date_of_birth=date(1995, 5, 12),
+            gender="female",
+        )
+        self.other_user = User.objects.create_user(
+            username="other-trend-user",
+            password="test-password",
+            role="patient",
+            date_of_birth=date(1990, 1, 1),
+            gender="male",
+        )
+        self.client.login(username="trend-user", password="test-password")
+
+        for sampling_date, value in ((date(2026, 1, 10), "120"), (date(2026, 5, 10), "132")):
+            blood_test = BloodTest.objects.create(user=self.user, sampling_date=sampling_date)
+            BloodTestResult.objects.create(
+                blood_test=blood_test,
+                parameter_code="HGB",
+                parameter_name="Hemoglobin",
+                numeric_value=Decimal(value),
+                unit="g/L",
+                reference_min=Decimal("119"),
+                reference_max=Decimal("157"),
+                status=BloodTestResult.Status.NORMAL,
+            )
+
+        other_test = BloodTest.objects.create(user=self.other_user, sampling_date=date(2026, 6, 1))
+        BloodTestResult.objects.create(
+            blood_test=other_test,
+            parameter_code="HGB",
+            parameter_name="Hemoglobin",
+            numeric_value=Decimal("999"),
+            unit="g/L",
+            status=BloodTestResult.Status.HIGH,
+        )
+
+    def test_trends_displays_users_measurements_and_statistics(self):
+        response = self.client.get(reverse("laboratory:trends"), {"parameter": "HGB", "unit": "g/L"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Hemoglobin")
+        self.assertContains(response, "132")
+        self.assertContains(response, "120")
+        self.assertNotContains(response, "999")
+        self.assertEqual(response.context["statistics"]["count"], 2)
+        self.assertEqual(response.context["statistics"]["latest"], 132.0)
+
+    def test_trends_requires_login(self):
+        self.client.logout()
+        response = self.client.get(reverse("laboratory:trends"))
+        self.assertEqual(response.status_code, 302)
+
+    def test_trends_handles_user_without_results(self):
+        empty_user = User.objects.create_user(
+            username="empty-trend-user",
+            password="test-password",
+            role="patient",
+            date_of_birth=date(2000, 1, 1),
+            gender="female",
+        )
+        self.client.login(username="empty-trend-user", password="test-password")
+        response = self.client.get(reverse("laboratory:trends"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Nema dovoljno podataka")

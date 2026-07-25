@@ -33,6 +33,7 @@
                             <a class="nav-link active" href="{% url 'home' %}">Nadzorna ploča</a>
                             <a class="nav-link" href="{% url 'laboratory:manual-create' %}">Novi nalaz</a>
                             <a class="nav-link" href="{% url 'laboratory:history' %}">Povijest nalaza</a>
+                            <a class="nav-link" href="{% url 'laboratory:trends' %}">Trendovi</a>
                             <a class="nav-link" href="{% url 'profile' %}">Profil</a>
                             <a class="nav-user ms-lg-3" href="{% url 'profile' %}" aria-label="Otvori korisnički profil">
                                 <span class="user-avatar">{{ user.username|first|upper }}</span>
@@ -76,5 +77,6 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_scripts %}{% endblock %}
 </body>
 </html>

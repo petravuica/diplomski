@@ -1,10 +1,11 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import Q
+from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
@@ -146,6 +147,97 @@ def blood_test_history(request):
             "selected_sort": sort,
             "query_string": query_params.urlencode(),
             "total_matching": paginator.count,
+        },
+    )
+
+
+@login_required
+def laboratory_trends(request):
+    """Show a chronological trend for one numeric laboratory parameter."""
+    numeric_results = BloodTestResult.objects.filter(
+        blood_test__user=request.user,
+        numeric_value__isnull=False,
+    )
+
+    parameter_rows = (
+        numeric_results.values("parameter_code", "parameter_name", "unit")
+        .order_by("parameter_name", "parameter_code", "unit")
+        .distinct()
+    )
+    parameters = list(parameter_rows)
+
+    selected_code = request.GET.get("parameter", "").strip()
+    selected_unit = request.GET.get("unit", "").strip()
+    selected_range = request.GET.get("range", "all").strip()
+    if selected_range not in {"all", "6m", "1y", "2y"}:
+        selected_range = "all"
+
+    available_codes = {row["parameter_code"] for row in parameters}
+    if not selected_code and parameters:
+        selected_code = parameters[0]["parameter_code"]
+    if selected_code not in available_codes:
+        selected_code = ""
+
+    results = numeric_results.none()
+    selected_parameter = None
+    if selected_code:
+        results = numeric_results.filter(parameter_code=selected_code)
+        units_for_code = list(
+            results.values_list("unit", flat=True).order_by("unit").distinct()
+        )
+        if selected_unit not in units_for_code:
+            selected_unit = units_for_code[0] if units_for_code else ""
+        results = results.filter(unit=selected_unit)
+
+        today = timezone.localdate()
+        range_days = {"6m": 183, "1y": 365, "2y": 730}
+        if selected_range in range_days:
+            results = results.filter(
+                blood_test__sampling_date__gte=today - timedelta(days=range_days[selected_range])
+            )
+
+        results = results.select_related("blood_test").order_by(
+            "blood_test__sampling_date", "blood_test__created_at"
+        )
+        selected_parameter = next(
+            (row for row in parameters if row["parameter_code"] == selected_code and row["unit"] == selected_unit),
+            next((row for row in parameters if row["parameter_code"] == selected_code), None),
+        )
+
+    points = []
+    for result in results:
+        points.append(
+            {
+                "date": result.blood_test.sampling_date.isoformat(),
+                "display_date": result.blood_test.sampling_date.strftime("%d.%m.%Y."),
+                "value": float(result.numeric_value),
+                "reference_min": float(result.reference_min) if result.reference_min is not None else None,
+                "reference_max": float(result.reference_max) if result.reference_max is not None else None,
+                "status": result.status,
+                "detail_url": reverse("laboratory:detail", args=[result.blood_test_id]),
+            }
+        )
+
+    values = [point["value"] for point in points]
+    statistics = {
+        "count": len(values),
+        "latest": values[-1] if values else None,
+        "minimum": min(values) if values else None,
+        "maximum": max(values) if values else None,
+        "change": (values[-1] - values[-2]) if len(values) >= 2 else None,
+    }
+
+    return render(
+        request,
+        "laboratory/laboratory_trends.html",
+        {
+            "parameters": parameters,
+            "selected_code": selected_code,
+            "selected_unit": selected_unit,
+            "selected_range": selected_range,
+            "selected_parameter": selected_parameter,
+            "trend_points": points,
+            "statistics": statistics,
         },
     )
 

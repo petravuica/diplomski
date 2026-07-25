@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% block title %}Trendovi nalaza | BloodLab AI{% endblock %}
+
+{% block content %}
+<section class="profile-hero">
+    <div class="container app-container detail-hero-row">
+        <div>
+            <span class="eyebrow">Praćenje kroz vrijeme</span>
+            <h1>Trendovi laboratorijskih parametara</h1>
+            <p>Usporedite vrijednosti istog parametra iz više spremljenih nalaza.</p>
+        </div>
+        <a class="btn btn-primary-app" href="{% url 'laboratory:manual-create' %}"><span class="btn-icon">＋</span> Novi nalaz</a>
+    </div>
+</section>
+
+<section class="profile-content">
+    <div class="container app-container">
+        <article class="panel-card trend-filter-card">
+            <form method="get" class="trend-filter-form">
+                <div class="trend-filter-main">
+                    <label class="form-label" for="parameter">Laboratorijski parametar</label>
+                    <select class="form-select" id="parameter" name="parameter" onchange="this.form.submit()">
+                        {% if not parameters %}<option value="">Nema dostupnih parametara</option>{% endif %}
+                        {% for parameter in parameters %}
+                            <option value="{{ parameter.parameter_code }}" {% if parameter.parameter_code == selected_code and parameter.unit == selected_unit %}selected{% endif %}>
+                                {{ parameter.parameter_name }} ({{ parameter.parameter_code }}){% if parameter.unit %} — {{ parameter.unit }}{% endif %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <input type="hidden" name="unit" value="{{ selected_unit }}">
+                </div>
+                <div>
+                    <label class="form-label" for="range">Razdoblje</label>
+                    <select class="form-select" id="range" name="range" onchange="this.form.submit()">
+                        <option value="all" {% if selected_range == 'all' %}selected{% endif %}>Svi nalazi</option>
+                        <option value="6m" {% if selected_range == '6m' %}selected{% endif %}>Posljednjih 6 mjeseci</option>
+                        <option value="1y" {% if selected_range == '1y' %}selected{% endif %}>Posljednjih godinu dana</option>
+                        <option value="2y" {% if selected_range == '2y' %}selected{% endif %}>Posljednje 2 godine</option>
+                    </select>
+                </div>
+            </form>
+        </article>
+
+        {% if selected_parameter and statistics.count %}
+            <div class="trend-stat-grid">
+                <article class="stat-card"><div class="stat-icon icon-blue">●</div><div><span>Posljednja vrijednost</span><strong>{{ statistics.latest|floatformat:"-6" }} <small>{{ selected_unit }}</small></strong></div></article>
+                <article class="stat-card"><div class="stat-icon icon-green">↓</div><div><span>Najniža vrijednost</span><strong>{{ statistics.minimum|floatformat:"-6" }} <small>{{ selected_unit }}</small></strong></div></article>
+                <article class="stat-card"><div class="stat-icon icon-orange">↑</div><div><span>Najviša vrijednost</span><strong>{{ statistics.maximum|floatformat:"-6" }} <small>{{ selected_unit }}</small></strong></div></article>
+                <article class="stat-card"><div class="stat-icon icon-gray">#</div><div><span>Broj mjerenja</span><strong>{{ statistics.count }}</strong></div></article>
+            </div>
+
+            <article class="panel-card mt-4 trend-chart-card">
+                <div class="panel-heading">
+                    <div>
+                        <span class="eyebrow">Graf kretanja</span>
+                        <h2>{{ selected_parameter.parameter_name }}</h2>
+                    </div>
+                    {% if statistics.change != None %}
+                        <div class="trend-change {% if statistics.change > 0 %}trend-up{% elif statistics.change < 0 %}trend-down{% endif %}">
+                            Promjena od prethodnog mjerenja: <strong>{{ statistics.change|floatformat:"-6" }} {{ selected_unit }}</strong>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="trend-chart-wrap"><canvas id="trendChart" aria-label="Graf trenda laboratorijskog parametra"></canvas></div>
+                <p class="trend-chart-note">Referentne granice prikazuju vrijednosti unesene uz svaki pojedini nalaz i mogu se razlikovati među laboratorijima.</p>
+            </article>
+
+            <article class="panel-card mt-4">
+                <div class="panel-heading"><div><span class="eyebrow">Mjerenja</span><h2>Pojedinačni rezultati</h2></div></div>
+                <div class="parameter-table-wrap">
+                    <table class="results-table trend-results-table">
+                        <thead><tr><th>Datum</th><th>Vrijednost</th><th>Referentni interval</th><th>Status</th><th></th></tr></thead>
+                        <tbody>
+                        {% for point in trend_points %}
+                            <tr>
+                                <td><strong>{{ point.display_date }}</strong></td>
+                                <td>{{ point.value|floatformat:"-6" }} {{ selected_unit }}</td>
+                                <td>{% if point.reference_min != None and point.reference_max != None %}{{ point.reference_min|floatformat:"-6" }} – {{ point.reference_max|floatformat:"-6" }}{% elif point.reference_min != None %}≥ {{ point.reference_min|floatformat:"-6" }}{% elif point.reference_max != None %}≤ {{ point.reference_max|floatformat:"-6" }}{% else %}—{% endif %}</td>
+                                <td><span class="result-status status-{{ point.status }}">{% if point.status == 'normal' %}Uredno{% elif point.status == 'low' %}Sniženo{% elif point.status == 'high' %}Povišeno{% else %}Nepoznato{% endif %}</span></td>
+                                <td><a class="history-open-link" href="{{ point.detail_url }}">Otvori nalaz →</a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+            {{ trend_points|json_script:"trend-data" }}
+        {% else %}
+            <article class="panel-card trend-empty-card mt-4">
+                <div class="empty-state-icon">↗</div>
+                <h2>Nema dovoljno podataka za prikaz trenda</h2>
+                {% if parameters %}
+                    <p>Za odabrani parametar i razdoblje nema brojčanih mjerenja. Odaberite drugo razdoblje ili dodajte novi nalaz.</p>
+                {% else %}
+                    <p>Trend će se pojaviti nakon što spremite barem jedan krvni nalaz s brojčanim rezultatom.</p>
+                {% endif %}
+                <a class="btn btn-primary-app" href="{% url 'laboratory:manual-create' %}">Dodaj krvni nalaz</a>
+            </article>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+{% if selected_parameter and statistics.count %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+    const element = document.getElementById('trend-data');
+    const canvas = document.getElementById('trendChart');
+    if (!element || !canvas || typeof Chart === 'undefined') return;
+    const points = JSON.parse(element.textContent);
+    const labels = points.map(point => point.display_date);
+    const values = points.map(point => point.value);
+    const lower = points.map(point => point.reference_min);
+    const upper = points.map(point => point.reference_max);
+
+    new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {label: '{{ selected_parameter.parameter_name|escapejs }}', data: values, borderWidth: 3, pointRadius: 5, pointHoverRadius: 7, tension: 0.25, spanGaps: true},
+                {label: 'Donja referentna granica', data: lower, borderWidth: 1.5, pointRadius: 2, borderDash: [6, 5], tension: 0, spanGaps: true},
+                {label: 'Gornja referentna granica', data: upper, borderWidth: 1.5, pointRadius: 2, borderDash: [6, 5], tension: 0, spanGaps: true}
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {mode: 'index', intersect: false},
+            scales: {
+                y: {title: {display: true, text: '{{ selected_unit|escapejs }}'}},
+                x: {title: {display: true, text: 'Datum uzorkovanja'}}
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        afterBody: function (items) {
+                            const point = points[items[0].dataIndex];
+                            return 'Status: ' + ({normal: 'Uredno', low: 'Sniženo', high: 'Povišeno', unknown: 'Nepoznato'}[point.status] || 'Nepoznato');
+                        }
+                    }
+                }
+            }
+        }
+    });
+})();
+</script>
+{% endif %}
+{% endblock %}
