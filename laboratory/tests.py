@@ -186,3 +186,81 @@ class ReferenceAnalysisServiceTests(TestCase):
             ),
             BloodTestResult.Status.NORMAL,
         )
+
+
+class BloodTestHistoryViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="history-user",
+            password="test-password",
+            role="patient",
+            date_of_birth=date(1998, 3, 10),
+            gender="female",
+        )
+        self.other_user = User.objects.create_user(
+            username="other-history-user",
+            password="test-password",
+            role="patient",
+            date_of_birth=date(1990, 1, 1),
+            gender="male",
+        )
+        self.client.login(username="history-user", password="test-password")
+
+        self.blood_test = BloodTest.objects.create(
+            user=self.user,
+            sampling_date=date(2026, 7, 20),
+            processing_status=BloodTest.ProcessingStatus.COMPLETED,
+        )
+        BloodTestResult.objects.create(
+            blood_test=self.blood_test,
+            parameter_code="CRP",
+            parameter_name="C-reaktivni protein",
+            numeric_value=Decimal("12"),
+            reference_max=Decimal("5"),
+            status=BloodTestResult.Status.HIGH,
+        )
+        self.other_test = BloodTest.objects.create(
+            user=self.other_user,
+            sampling_date=date(2026, 7, 19),
+        )
+
+    def test_history_displays_only_signed_in_users_tests(self):
+        response = self.client.get(reverse("laboratory:history"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "20.07.2026.")
+        self.assertNotContains(response, "19.07.2026.")
+
+    def test_history_can_filter_abnormal_tests(self):
+        response = self.client.get(
+            reverse("laboratory:history"), {"status": "abnormal"}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "1 odstupanja")
+
+    def test_history_searches_parameter_name(self):
+        response = self.client.get(
+            reverse("laboratory:history"), {"q": "reaktivni"}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "20.07.2026.")
+
+    def test_delete_requires_post_and_deletes_own_test(self):
+        delete_url = reverse("laboratory:delete", args=[self.blood_test.pk])
+        get_response = self.client.get(delete_url)
+        self.assertEqual(get_response.status_code, 200)
+        self.assertTrue(BloodTest.objects.filter(pk=self.blood_test.pk).exists())
+
+        post_response = self.client.post(delete_url)
+        self.assertRedirects(post_response, reverse("laboratory:history"))
+        self.assertFalse(BloodTest.objects.filter(pk=self.blood_test.pk).exists())
+
+    def test_user_cannot_delete_another_users_test(self):
+        response = self.client.post(
+            reverse("laboratory:delete", args=[self.other_test.pk])
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(BloodTest.objects.filter(pk=self.other_test.pk).exists())

@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% block title %}Povijest nalaza | BloodLab AI{% endblock %}
+
+{% block content %}
+<section class="profile-hero">
+    <div class="container app-container history-hero-row">
+        <div>
+            <span class="eyebrow">Krvni nalazi</span>
+            <h1>Povijest nalaza</h1>
+            <p>Pregledajte spremljene nalaze, pronađite određeni parametar i usporedite broj odstupanja.</p>
+        </div>
+        <a class="btn btn-primary-app" href="{% url 'laboratory:manual-create' %}"><span class="btn-icon">＋</span> Novi nalaz</a>
+    </div>
+</section>
+
+<section class="profile-content">
+    <div class="container app-container">
+        <article class="panel-card history-panel">
+            <form method="get" class="history-toolbar" aria-label="Filtri povijesti nalaza">
+                <div class="history-search">
+                    <label for="history-search">Pretraživanje</label>
+                    <input id="history-search" class="form-control" type="search" name="q" value="{{ search_query }}" placeholder="Parametar, šifra ili datum">
+                </div>
+                <div>
+                    <label for="status-filter">Status</label>
+                    <select id="status-filter" class="form-select" name="status">
+                        <option value="" {% if not selected_status %}selected{% endif %}>Svi nalazi</option>
+                        <option value="abnormal" {% if selected_status == 'abnormal' %}selected{% endif %}>S odstupanjima</option>
+                        <option value="normal" {% if selected_status == 'normal' %}selected{% endif %}>S urednim vrijednostima</option>
+                        <option value="high" {% if selected_status == 'high' %}selected{% endif %}>S povišenim vrijednostima</option>
+                        <option value="low" {% if selected_status == 'low' %}selected{% endif %}>Sa sniženim vrijednostima</option>
+                        <option value="unknown" {% if selected_status == 'unknown' %}selected{% endif %}>Bez intervala</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="sort-filter">Poredak</label>
+                    <select id="sort-filter" class="form-select" name="sort">
+                        <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>Najnoviji datum nalaza</option>
+                        <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>Najstariji datum nalaza</option>
+                        <option value="recently_added" {% if selected_sort == 'recently_added' %}selected{% endif %}>Nedavno dodano</option>
+                    </select>
+                </div>
+                <div class="history-toolbar-actions">
+                    <button class="btn btn-primary-app" type="submit">Primijeni</button>
+                    {% if search_query or selected_status or selected_sort != 'newest' %}
+                        <a class="btn btn-secondary-app" href="{% url 'laboratory:history' %}">Poništi</a>
+                    {% endif %}
+                </div>
+            </form>
+
+            <div class="history-results-heading">
+                <div>
+                    <span class="eyebrow">Rezultati</span>
+                    <h2>{{ total_matching }} {% if total_matching == 1 %}nalaz{% else %}nalaza{% endif %}</h2>
+                </div>
+            </div>
+
+            {% if page_obj.object_list %}
+                <div class="history-list">
+                    {% for blood_test in page_obj.object_list %}
+                        <article class="history-test-card">
+                            <div class="history-date-block">
+                                <span>{{ blood_test.sampling_date|date:"M" }}</span>
+                                <strong>{{ blood_test.sampling_date|date:"d" }}</strong>
+                                <small>{{ blood_test.sampling_date|date:"Y" }}</small>
+                            </div>
+                            <div class="history-test-main">
+                                <div class="history-test-title">
+                                    <div>
+                                        <h3>Krvni nalaz od {{ blood_test.sampling_date|date:"d.m.Y." }}</h3>
+                                        <p>{{ blood_test.get_input_method_display }} · uneseno {{ blood_test.created_at|date:"d.m.Y. u H:i" }}</p>
+                                    </div>
+                                    {% if blood_test.history_abnormal %}
+                                        <span class="history-overall-status abnormal">{{ blood_test.history_abnormal }} odstupanja</span>
+                                    {% elif blood_test.history_total %}
+                                        <span class="history-overall-status normal">Bez odstupanja</span>
+                                    {% else %}
+                                        <span class="history-overall-status unknown">Bez rezultata</span>
+                                    {% endif %}
+                                </div>
+                                <div class="history-metrics">
+                                    <div><span>Parametri</span><strong>{{ blood_test.history_total }}</strong></div>
+                                    <div><span>Uredno</span><strong class="metric-normal">{{ blood_test.history_summary.normal }}</strong></div>
+                                    <div><span>Sniženo</span><strong class="metric-low">{{ blood_test.history_summary.low }}</strong></div>
+                                    <div><span>Povišeno</span><strong class="metric-high">{{ blood_test.history_summary.high }}</strong></div>
+                                    <div><span>Bez intervala</span><strong>{{ blood_test.history_summary.unknown }}</strong></div>
+                                </div>
+                            </div>
+                            <div class="history-card-actions">
+                                <a class="btn btn-secondary-app" href="{% url 'laboratory:detail' blood_test.pk %}">Detalji</a>
+                                <a class="history-delete-link" href="{% url 'laboratory:delete' blood_test.pk %}?next={{ request.get_full_path|urlencode }}">Obriši</a>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+
+                {% if page_obj.has_other_pages %}
+                    <nav class="history-pagination" aria-label="Stranice povijesti nalaza">
+                        {% if page_obj.has_previous %}
+                            <a href="?{% if query_string %}{{ query_string }}&amp;{% endif %}page={{ page_obj.previous_page_number }}">← Prethodna</a>
+                        {% else %}<span></span>{% endif %}
+                        <strong>Stranica {{ page_obj.number }} od {{ page_obj.paginator.num_pages }}</strong>
+                        {% if page_obj.has_next %}
+                            <a href="?{% if query_string %}{{ query_string }}&amp;{% endif %}page={{ page_obj.next_page_number }}">Sljedeća →</a>
+                        {% else %}<span></span>{% endif %}
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">▤</div>
+                    <h3>Nema pronađenih nalaza</h3>
+                    {% if search_query or selected_status %}
+                        <p>Pokušajte promijeniti pojam pretraživanja ili odabrani status.</p>
+                        <a href="{% url 'laboratory:history' %}" class="btn btn-secondary-app">Prikaži sve nalaze</a>
+                    {% else %}
+                        <p>Dodajte prvi krvni nalaz kako biste ovdje vidjeli njegovu analizu i povijest.</p>
+                        <a href="{% url 'laboratory:manual-create' %}" class="btn btn-primary-app">Dodaj prvi nalaz</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </article>
+    </div>
+</section>
+{% endblock %}

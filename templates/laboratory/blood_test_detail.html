@@ -9,7 +9,10 @@
             <h1>Krvni nalaz od {{ blood_test.sampling_date|date:"d.m.Y." }}</h1>
             <p>Ručni unos · {{ blood_test.results.count }} spremljenih parametara</p>
         </div>
-        <a class="btn btn-primary-app" href="{% url 'laboratory:manual-create' %}"><span class="btn-icon">＋</span> Novi nalaz</a>
+        <div class="detail-hero-actions">
+            <a class="btn btn-secondary-app" href="{% url 'laboratory:history' %}">← Povijest nalaza</a>
+            <a class="btn btn-primary-app" href="{% url 'laboratory:manual-create' %}"><span class="btn-icon">＋</span> Novi nalaz</a>
+        </div>
     </div>
 </section>
 
@@ -64,6 +67,10 @@
                 </table>
             </div>
         </article>
+
+        <div class="detail-bottom-actions">
+            <a class="history-delete-link" href="{% url 'laboratory:delete' blood_test.pk %}">Obriši ovaj nalaz</a>
+        </div>
 
         <article class="panel-card info-card mt-4">
             <div class="info-symbol">i</div>

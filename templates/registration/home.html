@@ -39,7 +39,7 @@
                 <article class="panel-card empty-state-card">
                     <div class="panel-heading">
                         <div><span class="eyebrow">Krvni nalazi</span><h2>Nedavni nalazi</h2></div>
-                        <a href="#" class="text-link">Prikaži sve</a>
+                        <a href="{% url 'laboratory:history' %}" class="text-link">Prikaži sve</a>
                     </div>
                     {% if recent_blood_tests %}
                         <div class="recent-tests-list">
@@ -66,7 +66,7 @@
                     </div>
                     <div class="quick-actions">
                         <a href="{% url 'laboratory:manual-create' %}" class="quick-card"><span class="quick-icon">＋</span><div><strong>Novi nalaz</strong><small>Unesite laboratorijske vrijednosti</small></div><b>›</b></a>
-                        <a href="#" class="quick-card"><span class="quick-icon">▤</span><div><strong>Povijest nalaza</strong><small>Pregledajte prethodne rezultate</small></div><b>›</b></a>
+                        <a href="{% url 'laboratory:history' %}" class="quick-card"><span class="quick-icon">▤</span><div><strong>Povijest nalaza</strong><small>Pregledajte prethodne rezultate</small></div><b>›</b></a>
                         <a href="{% url 'profile' %}" class="quick-card"><span class="quick-icon">◯</span><div><strong>Korisnički profil</strong><small>Uredite osobne podatke</small></div><b>›</b></a>
                     </div>
                 </article>

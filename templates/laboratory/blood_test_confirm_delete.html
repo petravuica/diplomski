@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Brisanje nalaza | BloodLab AI{% endblock %}
+
+{% block content %}
+<section class="profile-content delete-page">
+    <div class="container app-container">
+        <article class="panel-card delete-confirm-card">
+            <div class="delete-warning-icon">!</div>
+            <span class="eyebrow">Potvrda brisanja</span>
+            <h1>Obrisati krvni nalaz?</h1>
+            <p>Trajno će se obrisati nalaz od <strong>{{ blood_test.sampling_date|date:"d.m.Y." }}</strong> i svih njegovih <strong>{{ blood_test.results.count }}</strong> rezultata. Ovu radnju nije moguće poništiti.</p>
+            <div class="delete-actions">
+                <a class="btn btn-secondary-app" href="{{ cancel_url }}">Odustani</a>
+                <form method="post">
+                    {% csrf_token %}
+                    <button class="btn btn-danger-app" type="submit">Trajno obriši nalaz</button>
+                </form>
+            </div>
+        </article>
+    </div>
+</section>
+{% endblock %}
