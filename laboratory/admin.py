@@ -15,6 +15,7 @@ class BloodTestResultInline(admin.TabularInline):
         "reference_min",
         "reference_max",
         "status",
+        "parser_confidence",
     )
 
 
@@ -45,8 +46,10 @@ class BloodTestResultAdmin(admin.ModelAdmin):
         "text_value",
         "unit",
         "status",
+        "parser_confidence",
     )
-    list_filter = ("status", "parameter_code")
+    list_filter = ("status",
+        "parser_confidence", "parameter_code")
     search_fields = (
         "parameter_code",
         "parameter_name",

@@ -66,6 +66,9 @@ def pdf_blood_test_upload(request):
                             reference_min=item.reference_min,
                             reference_max=item.reference_max,
                             reference_text=item.reference_text,
+                            parser_confidence=item.confidence,
+                            parser_source_line=item.source_line,
+                            normalization_note=item.normalization_note,
                         )
                         ReferenceAnalysisService.analyze_result(result, save=False)
                         pending_results.append(result)
@@ -121,6 +124,9 @@ def pdf_blood_test_review(request, pk):
             "reference_min": result.reference_min,
             "reference_max": result.reference_max,
             "reference_text": result.reference_text,
+            "parser_confidence": result.parser_confidence,
+            "parser_source_line": result.parser_source_line,
+            "normalization_note": result.normalization_note,
         }
         for result in existing_results
     ]
@@ -159,6 +165,9 @@ def pdf_blood_test_review(request, pk):
                             reference_min=row.get("reference_min"),
                             reference_max=row.get("reference_max"),
                             reference_text=row.get("reference_text", "").strip(),
+                            parser_confidence=row.get("parser_confidence", "").strip(),
+                            parser_source_line=row.get("parser_source_line", "").strip()[:500],
+                            normalization_note=row.get("normalization_note", "").strip(),
                         )
                         ReferenceAnalysisService.analyze_result(result, save=False)
                         final_results.append(result)
@@ -178,6 +187,8 @@ def pdf_blood_test_review(request, pk):
             "metadata_form": metadata_form,
             "formset": formset,
             "recognized_count": len(existing_results),
+            "high_confidence_count": sum(r.parser_confidence == "high" for r in existing_results),
+            "review_count": sum(r.parser_confidence in {"medium", "low"} for r in existing_results),
         },
     )
 

@@ -147,6 +147,15 @@ class BloodTestResult(models.Model):
         choices=Status.choices,
         default=Status.UNKNOWN,
     )
+    parser_confidence = models.CharField(
+        "Pouzdanost automatskog prepoznavanja", max_length=10, blank=True
+    )
+    parser_source_line = models.CharField(
+        "Izvorni redak iz PDF-a", max_length=500, blank=True
+    )
+    normalization_note = models.CharField(
+        "Napomena o normalizaciji", max_length=255, blank=True
+    )
     created_at = models.DateTimeField("Datum stvaranja", auto_now_add=True)
     updated_at = models.DateTimeField("Zadnja izmjena", auto_now=True)
 

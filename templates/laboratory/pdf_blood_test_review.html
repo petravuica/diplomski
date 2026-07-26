@@ -10,7 +10,7 @@
             <div>
                 <span class="eyebrow">Korak 2 od 2</span>
                 <h1>Provjerite prepoznate podatke</h1>
-                <p>Prepoznato je {{ recognized_count }} parametara. Ispravite samo ono što se ne podudara s izvornim nalazom.</p>
+                <p>Prepoznato je {{ recognized_count }} parametara. {{ high_confidence_count }} redaka ima visoku pouzdanost, a {{ review_count }} je označeno za kratku provjeru.</p>
             </div>
             {% if blood_test.source_file %}
                 <a class="btn btn-secondary-app" href="{{ blood_test.source_file.url }}" target="_blank" rel="noopener">Otvori izvorni PDF</a>
@@ -27,32 +27,44 @@
                         {% for error in metadata_form.sampling_date.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
                     </div>
                     <div class="review-tip">
-                        <strong>Što provjeriti?</strong>
-                        <span>Datum uzorkovanja, decimalni zarez/točku, jedinicu i referentni interval.</span>
+                        <strong>Usredotočite se na označene retke</strong>
+                        <span>Zeleni retci su vrlo pouzdano očitani. Žuti i crveni retci traže provjeru prema izvornom PDF-u.</span>
                     </div>
+                </div>
+                <div class="confidence-legend" aria-label="Legenda pouzdanosti">
+                    <span><i class="confidence-dot confidence-high"></i> Visoka pouzdanost</span>
+                    <span><i class="confidence-dot confidence-medium"></i> Preporučena provjera</span>
+                    <span><i class="confidence-dot confidence-low"></i> Obavezna provjera</span>
                 </div>
             </div>
 
             {{ formset.management_form }}
-            {% if formset.non_form_errors %}
-                <div class="alert alert-danger">{{ formset.non_form_errors }}</div>
-            {% endif %}
+            {% if formset.non_form_errors %}<div class="alert alert-danger">{{ formset.non_form_errors }}</div>{% endif %}
 
             <div class="app-card review-table-card">
                 <div class="table-responsive">
                     <table class="table pdf-review-table align-middle">
-                        <thead>
-                            <tr>
-                                <th>Spremi</th><th>Šifra i parametar</th><th>Vrijednost</th><th>Jedinica</th><th>Referentno od</th><th>Referentno do</th><th>Izvorni interval</th>
-                            </tr>
-                        </thead>
+                        <thead><tr>
+                            <th>Status</th><th>Spremi</th><th>Šifra i parametar</th><th>Vrijednost</th><th>Jedinica</th><th>Referentno od</th><th>Referentno do</th><th>Izvorni interval</th>
+                        </tr></thead>
                         <tbody>
                         {% for row in formset %}
-                            <tr class="review-result-row">
+                            <tr class="review-result-row confidence-row-{{ row.parser_confidence.value|default:'medium' }}">
+                                <td class="confidence-cell">
+                                    {% if row.parser_confidence.value == "high" %}
+                                        <span class="confidence-badge badge-high">Pouzdano</span>
+                                    {% elif row.parser_confidence.value == "low" %}
+                                        <span class="confidence-badge badge-low">Provjeri</span>
+                                    {% else %}
+                                        <span class="confidence-badge badge-medium">Pregledaj</span>
+                                    {% endif %}
+                                    {% if row.normalization_note.value %}<small class="normalization-note">{{ row.normalization_note.value }}</small>{% endif %}
+                                    {% if row.parser_source_line.value %}<details class="source-line"><summary>Izvorni redak</summary><code>{{ row.parser_source_line.value }}</code></details>{% endif %}
+                                    {{ row.parser_confidence }}{{ row.parser_source_line }}{{ row.normalization_note }}
+                                </td>
                                 <td class="include-cell">{{ row.include }}</td>
                                 <td class="parameter-cell">
-                                    {{ row.parameter_code }}
-                                    {{ row.parameter_name }}
+                                    {{ row.parameter_code }}{{ row.parameter_name }}
                                     {% for error in row.parameter_code.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
                                     {% for error in row.parameter_name.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
                                 </td>
@@ -62,10 +74,7 @@
                                     {% for error in row.numeric_value.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
                                     {% for error in row.non_field_errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
                                 </td>
-                                <td>{{ row.unit }}</td>
-                                <td>{{ row.reference_min }}</td>
-                                <td>{{ row.reference_max }}</td>
-                                <td>{{ row.reference_text }}</td>
+                                <td>{{ row.unit }}</td><td>{{ row.reference_min }}</td><td>{{ row.reference_max }}</td><td>{{ row.reference_text }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -73,9 +82,7 @@
                 </div>
             </div>
 
-            <div class="review-disclaimer">
-                Automatsko prepoznavanje može pogriješiti. Konačnim spremanjem potvrđujete da ste podatke usporedili s izvornim PDF nalazom.
-            </div>
+            <div class="review-disclaimer">Automatsko prepoznavanje može pogriješiti. Konačnim spremanjem potvrđujete da ste označene podatke usporedili s izvornim PDF nalazom.</div>
             <div class="form-actions sticky-review-actions">
                 <a class="btn btn-secondary-app" href="{% url 'laboratory:delete' blood_test.pk %}?next={% url 'laboratory:history' %}">Odustani i ukloni nacrt</a>
                 <button class="btn btn-primary-app" type="submit">Potvrdi i spremi nalaz</button>

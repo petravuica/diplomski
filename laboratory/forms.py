@@ -207,6 +207,9 @@ class PdfResultReviewForm(forms.Form):
         label="Izvorni interval", required=False, max_length=255,
         widget=forms.TextInput(attrs={"class": "form-control"}),
     )
+    parser_confidence = forms.CharField(required=False, widget=forms.HiddenInput())
+    parser_source_line = forms.CharField(required=False, widget=forms.HiddenInput())
+    normalization_note = forms.CharField(required=False, widget=forms.HiddenInput())
 
     def clean(self):
         cleaned_data = super().clean()
