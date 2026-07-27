@@ -1,0 +1,54 @@
+IZVJEŠTAJ O ČIŠĆENJU – ANEMIA DATASET
+======================================================================
+
+1. OSNOVNE INFORMACIJE
+----------------------------------------------------------------------
+Početni broj zapisa: 1004
+Konačni broj zapisa: 955
+Ukupno uklonjeno zapisa: 49
+Postotak uklonjenih zapisa: 4.88%
+
+2. UKLANJANJE PO KORACIMA
+----------------------------------------------------------------------
+duplicates_removed: 27
+missing_rows_removed: 1
+invalid_gender_rows_removed: 0
+invalid_target_rows_removed: 0
+non_positive_rows_removed: 0
+inconsistent_rows_removed: 21
+final_row_count: 955
+
+3. RASPODJELA CILJNE VARIJABLE PRIJE ČIŠĆENJA
+----------------------------------------------------------------------
+Decision_Class
+0    574
+1    430
+
+4. RASPODJELA CILJNE VARIJABLE NAKON ČIŠĆENJA
+----------------------------------------------------------------------
+Decision_Class
+0    564
+1    391
+
+5. RASPODJELA SPOLA PRIJE ČIŠĆENJA
+----------------------------------------------------------------------
+Gender
+F    533
+M    471
+
+6. RASPODJELA SPOLA NAKON ČIŠĆENJA
+----------------------------------------------------------------------
+Gender
+F    502
+M    453
+
+7. ZAVRŠNA PROVJERA
+----------------------------------------------------------------------
+Nedostajuće vrijednosti: 0
+Duplikati: 0
+Vrijednosti spola: ['F', 'M']
+Ciljne klase: [np.int64(0), np.int64(1)]
+
+8. METODOLOŠKA NAPOMENA
+----------------------------------------------------------------------
+Statistički outlieri nisu automatski uklanjani. Uklonjeni su samo potpuni duplikati, zapisi s nedostajućim ili nedopuštenim vrijednostima te zapisi s većim odstupanjem između izvornih i matematički izvedenih hematoloških pokazatelja. Vrijednosti nisu ručno korigirane jer bez pristupa izvornim laboratorijskim nalazima nije moguće pouzdano utvrditi koji je parametar pogrešno unesen.
