@@ -1,0 +1,53 @@
+ZAVRŠNA EVALUACIJA MODELA – ANEMIA DATASET
+================================================================================
+
+1. OSNOVNE INFORMACIJE
+--------------------------------------------------------------------------------
+Broj testnih zapisa: 191
+Testni skup korišten je prvi put u ovoj evaluaciji.
+Pozitivna klasa: 1
+Negativna klasa: 0
+
+2. REZULTATI MODELA NA TESTNOM SKUPU
+--------------------------------------------------------------------------------
+         model_name  accuracy_test  balanced_accuracy_test  precision_test  recall_test  specificity_test  f1_test  roc_auc_test  true_negative  false_positive  false_negative  true_positive
+      Random Forest       0.984293                0.984740        0.974684     0.987179          0.982301 0.980892      0.998752            111               2               1             77
+Logistic Regression       0.979058                0.980315        0.962500     0.987179          0.973451 0.974684      0.998071            110               3               1             77
+   Dummy Classifier       0.591623                0.500000        0.000000     0.000000          1.000000 0.000000      0.500000            113               0              78              0
+
+3. USPOREDBA CV I TESTNIH REZULTATA
+--------------------------------------------------------------------------------
+         model_name  best_balanced_accuracy_cv  balanced_accuracy_test  balanced_accuracy_difference    f1_cv  f1_test  f1_difference  roc_auc_cv  roc_auc_test  roc_auc_difference
+      Random Forest                   0.961603                0.984740                      0.023137 0.955074 0.980892       0.025818    0.989333      0.998752            0.009419
+Logistic Regression                   0.959419                0.980315                      0.020896 0.952054 0.974684       0.022629    0.991894      0.998071            0.006177
+   Dummy Classifier                   0.500000                0.500000                      0.000000 0.000000 0.000000       0.000000    0.500000      0.500000            0.000000
+
+4. ODABRANI MODEL
+--------------------------------------------------------------------------------
+Naziv modela: Random Forest
+Test accuracy: 0.9843
+Test balanced accuracy: 0.9847
+Test precision: 0.9747
+Test recall / osjetljivost: 0.9872
+Test specifičnost: 0.9823
+Test F1: 0.9809
+Test ROC AUC: 0.9988
+True negative: 111
+False positive: 2
+False negative: 1
+True positive: 77
+
+5. CLASSIFICATION REPORT ODABRANOG MODELA
+--------------------------------------------------------------------------------
+              precision    recall  f1-score   support
+
+     Klasa 0     0.9911    0.9823    0.9867       113
+     Klasa 1     0.9747    0.9872    0.9809        78
+
+    accuracy                         0.9843       191
+   macro avg     0.9829    0.9847    0.9838       191
+weighted avg     0.9844    0.9843    0.9843       191
+
+6. METODOLOŠKA NAPOMENA
+--------------------------------------------------------------------------------
+Završna evaluacija provedena je na prethodno izdvojenom testnom skupu koji nije korišten tijekom treniranja, optimizacije hiperparametara ni odabira modela. Na taj način dobivena je neovisna procjena sposobnosti generalizacije modela na novim podacima.

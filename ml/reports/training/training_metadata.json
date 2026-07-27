@@ -1,0 +1,31 @@
+{
+    "created_at_utc": "2026-07-27T21:32:12.527894+00:00",
+    "dataset_path": "C:\\Users\\ACER\\DIPLOMSKI\\blood_analysis\\ml\\data\\processed\\anemia_dataset_clean.csv",
+    "total_rows": 955,
+    "training_rows": 764,
+    "test_rows": 191,
+    "test_size": 0.2,
+    "random_state": 42,
+    "cross_validation_folds": 5,
+    "selection_metric": "balanced_accuracy",
+    "feature_columns": [
+        "Gender",
+        "Age",
+        "HGB",
+        "RBC",
+        "HCT",
+        "MCV",
+        "MCH",
+        "MCHC"
+    ],
+    "target_column": "Decision_Class",
+    "best_model_name": "Random Forest",
+    "best_cv_balanced_accuracy": 0.9616034503131278,
+    "best_parameters": {
+        "classifier__class_weight": null,
+        "classifier__max_depth": 10,
+        "classifier__min_samples_leaf": 1,
+        "classifier__n_estimators": 200
+    },
+    "test_set_evaluated": false
+}

@@ -1,0 +1,16 @@
+{
+    "test_rows": 191,
+    "best_model_name": "Random Forest",
+    "accuracy_test": 0.9842931937172775,
+    "balanced_accuracy_test": 0.9847401860676197,
+    "precision_test": 0.9746835443037974,
+    "recall_test": 0.9871794871794872,
+    "specificity_test": 0.9823008849557522,
+    "f1_test": 0.9808917197452229,
+    "roc_auc_test": 0.9987519854776492,
+    "true_negative": 111,
+    "false_positive": 2,
+    "false_negative": 1,
+    "true_positive": 77,
+    "test_set_evaluated": true
+}
