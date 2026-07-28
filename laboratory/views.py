@@ -19,6 +19,7 @@ from .forms import (
 from .models import BloodTest, BloodTestResult
 from .pdf_parser import LaboratoryPdfParser, PdfParsingError
 from .services import ReferenceAnalysisService
+from .ml_services.anemia_prediction import predict_anemia
 
 
 @login_required
@@ -428,13 +429,79 @@ def blood_test_detail(request, pk):
         pk=pk,
         user=request.user,
     )
-    analysis_summary = ReferenceAnalysisService.analyze_blood_test(blood_test)
+
+    analysis_summary = ReferenceAnalysisService.analyze_blood_test(
+        blood_test
+    )
+
+    anemia_prediction = None
+    anemia_prediction_message = None
+
+    required_parameters = {
+        "RBC",
+        "HGB",
+        "HCT",
+        "MCV",
+        "MCH",
+        "MCHC",
+    }
+
+    result_values = {
+        result.parameter_code.strip().upper(): result.numeric_value
+        for result in blood_test.results.all()
+        if result.numeric_value is not None
+    }
+
+    missing_parameters = sorted(
+        required_parameters - result_values.keys()
+    )
+
+    if missing_parameters:
+        anemia_prediction_message = (
+            "Predikcija anemije nije dostupna jer nedostaju parametri: "
+            + ", ".join(missing_parameters)
+            + "."
+        )
+
+    elif blood_test.age_at_test is None:
+        anemia_prediction_message = (
+            "Predikcija anemije nije dostupna jer nije spremljena "
+            "dob korisnika u trenutku nalaza."
+        )
+
+    elif blood_test.gender_at_test not in {"female", "male"}:
+        anemia_prediction_message = (
+            "Predikcija anemije trenutačno je dostupna samo za "
+            "ženski ili muški spol."
+        )
+
+    else:
+        try:
+            anemia_prediction = predict_anemia(
+                gender=blood_test.gender_at_test,
+                age=blood_test.age_at_test,
+                hgb=result_values["HGB"],
+                rbc=result_values["RBC"],
+                hct=result_values["HCT"],
+                mcv=result_values["MCV"],
+                mch=result_values["MCH"],
+                mchc=result_values["MCHC"],
+            )
+        except (ValueError, FileNotFoundError) as exc:
+            anemia_prediction_message = str(exc)
+        except Exception:
+            anemia_prediction_message = (
+                "Predikciju anemije trenutačno nije moguće izračunati."
+            )
+
     return render(
         request,
         "laboratory/blood_test_detail.html",
         {
             "blood_test": blood_test,
             "analysis_summary": analysis_summary,
+            "anemia_prediction": anemia_prediction,
+            "anemia_prediction_message": anemia_prediction_message,
         },
     )
 

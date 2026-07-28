@@ -25,6 +25,67 @@
             <article class="stat-card"><div class="stat-icon icon-gray">?</div><div><span>Bez intervala</span><strong>{{ analysis_summary.unknown }}</strong></div></article>
         </div>
 
+        {% if anemia_prediction %}
+    <article class="panel-card mt-4">
+        <div class="panel-heading">
+            <div>
+                <span class="eyebrow">ML analiza</span>
+                <h2>Procjena pokazatelja anemije</h2>
+            </div>
+        </div>
+
+        <div class="anemia-prediction-card
+            {% if anemia_prediction.prediction == 1 %}
+                anemia-positive
+            {% else %}
+                anemia-negative
+            {% endif %}
+        ">
+            <div class="anemia-prediction-icon">
+                {% if anemia_prediction.prediction == 1 %}
+                    !
+                {% else %}
+                    ✓
+                {% endif %}
+            </div>
+
+            <div class="anemia-prediction-content">
+                <h3>{{ anemia_prediction.label }}</h3>
+
+                <p>
+                    Model procjenjuje vjerojatnost prisutnosti pokazatelja anemije na
+                    <strong>{{ anemia_prediction.anemia_probability_percent }} %</strong>.
+                </p>
+
+                <div class="prediction-probability">
+                    <span>Vjerojatnost anemije</span>
+                    <strong>{{ anemia_prediction.anemia_probability_percent }} %</strong>
+                </div>
+
+                <div class="prediction-progress">
+                    <div
+                        class="prediction-progress-value"
+                        style="width: {{ anemia_prediction.anemia_probability_percent }} %;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p class="prediction-disclaimer">
+            Rezultat je generiran modelom strojnog učenja na temelju dobi, spola,
+            hemoglobina, eritrocita, hematokrita, MCV-a, MCH-a i MCHC-a.
+            Rezultat je informativan i ne predstavlja medicinsku dijagnozu.
+        </p>
+    </article>
+
+{% elif anemia_prediction_message %}
+    <article class="panel-card info-card mt-4">
+        <div class="info-symbol">i</div>
+        <h3>ML procjena anemije nije dostupna</h3>
+        <p>{{ anemia_prediction_message }}</p>
+    </article>
+{% endif %}
+
         <article class="panel-card mt-4">
             <div class="panel-heading">
                 <div><span class="eyebrow">Rezultati</span><h2>Laboratorijske vrijednosti</h2></div>

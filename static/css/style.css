@@ -600,3 +600,95 @@ a { color: var(--blue); }
 .source-line { margin-top:.45rem; max-width:220px; }
 .source-line summary { cursor:pointer; color:#536777; font-size:.78rem; }
 .source-line code { display:block; white-space:normal; margin-top:.3rem; color:#455a68; font-size:.72rem; }
+
+.anemia-prediction-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    border-radius: 16px;
+    border: 1px solid #dfe5e8;
+    background: #f8fafb;
+}
+
+.anemia-prediction-card.anemia-positive {
+    border-color: #efb5b5;
+    background: #fff5f5;
+}
+
+.anemia-prediction-card.anemia-negative {
+    border-color: #b7dfc8;
+    background: #f3fbf6;
+}
+
+.anemia-prediction-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 48px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    font-size: 1.35rem;
+    font-weight: 700;
+    background: #e8edef;
+}
+
+.anemia-positive .anemia-prediction-icon {
+    color: #a12828;
+    background: #f8d7d7;
+}
+
+.anemia-negative .anemia-prediction-icon {
+    color: #1f7047;
+    background: #d8f0e2;
+}
+
+.anemia-prediction-content {
+    flex: 1;
+}
+
+.anemia-prediction-content h3 {
+    margin: 0 0 0.5rem;
+}
+
+.anemia-prediction-content p {
+    margin: 0 0 1rem;
+}
+
+.prediction-probability {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.prediction-progress {
+    height: 10px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #e1e7e9;
+}
+
+.prediction-progress-value {
+    height: 100%;
+    border-radius: inherit;
+    background: currentColor;
+}
+
+.anemia-positive .prediction-progress-value {
+    color: #c43c3c;
+    background: #c43c3c;
+}
+
+.anemia-negative .prediction-progress-value {
+    color: #32865a;
+    background: #32865a;
+}
+
+.prediction-disclaimer {
+    margin: 1rem 0 0;
+    color: #687277;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
