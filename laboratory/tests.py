@@ -361,3 +361,69 @@ class LaboratoryPdfParserTests(TestCase):
         self.assertEqual(parsed.parameter_code, "CHOL")
         self.assertIsNone(parsed.reference_min)
         self.assertEqual(parsed.reference_max, Decimal("5.0"))
+    
+    def test_parser_recognizes_full_name_followed_by_abbreviation(self):
+        from laboratory.pdf_parser import LaboratoryPdfParser
+
+        parsed = LaboratoryPdfParser._parse_result_line(
+            "Hemoglobin (HGB) 7.5 g/dL 12.0 - 16.0"
+        )
+
+        self.assertIsNotNone(parsed)
+        self.assertEqual(parsed.parameter_code, "HGB")
+
+        # Parser kanonski sprema HGB u g/L.
+        self.assertEqual(parsed.numeric_value, Decimal("75.0"))
+        self.assertEqual(parsed.unit, "g/L")
+        self.assertEqual(parsed.reference_min, Decimal("120.0"))
+        self.assertEqual(parsed.reference_max, Decimal("160.0"))
+        self.assertEqual(
+            parsed.normalization_note,
+            "Pretvoreno iz g/dL u g/L.",
+    )
+        
+    def test_parser_recognizes_rbc_abbreviation_in_parentheses(self):
+        from laboratory.pdf_parser import LaboratoryPdfParser
+
+        parsed = LaboratoryPdfParser._parse_result_line(
+            "Eritrociti (RBC) 3.20 10^12/L 4.00 - 5.20"
+        )
+
+        self.assertIsNotNone(parsed)
+        self.assertEqual(parsed.parameter_code, "RBC")
+        self.assertEqual(parsed.numeric_value, Decimal("3.20"))
+        self.assertEqual(parsed.unit, "10^12/L")
+        self.assertEqual(parsed.reference_min, Decimal("4.00"))
+        self.assertEqual(parsed.reference_max, Decimal("5.20"))
+    
+    def test_parser_recognizes_hct_abbreviation_in_parentheses(self):
+        from laboratory.pdf_parser import LaboratoryPdfParser
+
+        parsed = LaboratoryPdfParser._parse_result_line(
+            "Hematokrit (PCV/HCT) 24 % 36 - 46"
+        )
+
+        self.assertIsNotNone(parsed)
+        self.assertEqual(parsed.parameter_code, "HCT")
+        self.assertEqual(parsed.numeric_value, Decimal("24"))
+        self.assertEqual(parsed.unit, "%")
+        self.assertEqual(parsed.reference_min, Decimal("36"))
+        self.assertEqual(parsed.reference_max, Decimal("46"))
+    
+    def test_parser_converts_hct_from_l_per_l_to_percentage(self):
+        from laboratory.pdf_parser import LaboratoryPdfParser
+
+        parsed = LaboratoryPdfParser._parse_result_line(
+            "Hematokrit (HCT) 0.36 L/L 0.36 - 0.46"
+        )
+
+        self.assertIsNotNone(parsed)
+        self.assertEqual(parsed.parameter_code, "HCT")
+        self.assertEqual(parsed.numeric_value, Decimal("36.00"))
+        self.assertEqual(parsed.unit, "%")
+        self.assertEqual(parsed.reference_min, Decimal("36.00"))
+        self.assertEqual(parsed.reference_max, Decimal("46.00"))
+        self.assertEqual(
+            parsed.normalization_note,
+            "Pretvoreno iz L/L u %.",
+        )

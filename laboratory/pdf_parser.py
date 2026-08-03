@@ -58,7 +58,7 @@ PARAMETERS: tuple[ParameterDefinition, ...] = (
     ParameterDefinition("WBC", "Leukociti (WBC)", ("leukociti", "leukocytes", "wbc", "lkc"), "10^9/L"),
     ParameterDefinition("RBC", "Eritrociti (RBC)", ("eritrociti", "erythrocytes", "rbc", "erc"), "10^12/L"),
     ParameterDefinition("HGB", "Hemoglobin (HGB)", ("hemoglobin", "haemoglobin", "hgb", "hb"), "g/L"),
-    ParameterDefinition("HCT", "Hematokrit (HCT)", ("hematokrit", "haematocrit", "hct"), "L/L"),
+    ParameterDefinition("HCT", "Hematokrit (HCT)", ("hematokrit", "haematocrit", "hct"), "%"),
     ParameterDefinition("MCV", "Prosječni volumen eritrocita (MCV)", ("mcv",), "fL"),
     ParameterDefinition("MCH", "Prosječna količina hemoglobina (MCH)", ("mch",), "pg"),
     ParameterDefinition("MCHC", "Prosječna koncentracija hemoglobina (MCHC)", ("mchc",), "g/L"),
@@ -163,6 +163,7 @@ def _conversion(code: str, unit: str) -> tuple[str, Decimal, str] | None:
     table: dict[tuple[str, str], tuple[str, str, str]] = {
         ("HGB", "g/dL"): ("g/L", "10", "Pretvoreno iz g/dL u g/L."),
         ("MCHC", "g/dL"): ("g/L", "10", "Pretvoreno iz g/dL u g/L."),
+        ("HCT", "L/L"): ("%", "100", "Pretvoreno iz L/L u %."),
         ("CREA", "mg/dL"): ("µmol/L", "88.4", "Pretvoreno iz mg/dL u µmol/L."),
         ("GLU", "mg/dL"): ("mmol/L", "0.0555", "Pretvoreno iz mg/dL u mmol/L."),
         ("CHOL", "mg/dL"): ("mmol/L", "0.02586", "Pretvoreno iz mg/dL u mmol/L."),
@@ -340,6 +341,11 @@ class LaboratoryPdfParser:
             return None
 
         tail = cleaned[alias_end:].strip(" :.-")
+        # Neki laboratoriji nakon punog naziva navode kraticu u zagradi:
+        # "Hemoglobin (HGB) 129 g/L".
+        # Alias "hemoglobin" već je prepoznat, pa zagradu treba ukloniti
+        # prije parsiranja brojčane vrijednosti.
+        tail = re.sub(r"^\([^)]*\)\s*", "", tail)
         value_match = re.match(rf"^(?P<value>{_NUM}|{_TEXT_VALUES})(?:\s|$)", tail, re.IGNORECASE)
         if not value_match:
             return None

@@ -11,7 +11,6 @@ import django
 django.setup()
 
 from laboratory.ml_services.anemia_prediction import predict_anemia
-from laboratory.ml_services.anemia_prediction import predict_anemia
 
 test_cases = [
     {
