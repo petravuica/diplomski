@@ -4,10 +4,10 @@ import json
 import joblib
 import pandas as pd
 from sklearn.compose import ColumnTransformer
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.impute import SimpleImputer
-from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.preprocessing import OneHotEncoder
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -43,7 +43,6 @@ METADATA_PATH = (
     REPORT_DIR
     / "final_liver_model_metadata.json"
 )
-
 
 TARGET_COLUMN = "Liver_Disease"
 
@@ -127,10 +126,6 @@ def create_pipeline():
                     strategy="median",
                 ),
             ),
-            (
-                "scaler",
-                StandardScaler(),
-            ),
         ]
     )
 
@@ -167,12 +162,13 @@ def create_pipeline():
         ]
     )
 
-    model = LogisticRegression(
-        C=0.1,
+    model = RandomForestClassifier(
+        n_estimators=400,
+        max_depth=8,
+        min_samples_leaf=3,
         class_weight="balanced",
-        solver="liblinear",
-        max_iter=3000,
         random_state=42,
+        n_jobs=1,
     )
 
     pipeline = Pipeline(
@@ -195,7 +191,7 @@ def save_metadata(
     X_train,
 ):
     metadata = {
-        "model_name": "Logistic Regression",
+        "model_name": "Random Forest",
         "model_purpose": (
             "Informativna procjena obrasca "
             "povezanog s jetrenom bolešću"
@@ -207,10 +203,19 @@ def save_metadata(
         "negative_class": 0,
         "training_rows": len(X_train),
         "hyperparameters": {
-            "C": 0.1,
+            "n_estimators": 400,
+            "max_depth": 8,
+            "min_samples_leaf": 3,
             "class_weight": "balanced",
-            "solver": "liblinear",
+            "random_state": 42,
+            "n_jobs": 1,
         },
+        "selection_reason": (
+            "Random Forest je odabran zbog uravnoteženijeg "
+            "prepoznavanja obje klase i višeg recall-a pozitivne "
+            "klase u odnosu na logističku regresiju, uz prihvatljiv "
+            "pad balanced accuracy."
+        ),
     }
 
     with METADATA_PATH.open(
@@ -237,7 +242,7 @@ def main():
     )
 
     print(
-        "Izrada finalnog pipelinea..."
+        "Izrada finalnog Random Forest pipelinea..."
     )
 
     model = create_pipeline()
@@ -269,6 +274,10 @@ def main():
         "FINALNI JETRENI MODEL USPJEŠNO TRENIRAN"
     )
     print("=" * 70)
+
+    print(
+        "Model: Random Forest"
+    )
 
     print(
         f"Broj trening zapisa: "
