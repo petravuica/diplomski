@@ -1,0 +1,65 @@
+IZVJEŠTAJ O TRENIRANJU MODELA – ANEMIA DATASET
+===========================================================================
+
+1. OSNOVNE INFORMACIJE
+---------------------------------------------------------------------------
+Ukupan broj zapisa: 955
+Broj ulaznih značajki: 8
+Trening zapisi: 764
+Testni zapisi: 191
+Omjer testnog skupa: 20%
+Random state: 42
+Broj CV podjela: 5
+Metrika za odabir modela: balanced accuracy
+
+2. ULAZNE ZNAČAJKE
+---------------------------------------------------------------------------
+- Gender
+- Age
+- HGB
+- RBC
+- HCT
+- MCV
+- MCH
+- MCHC
+
+3. RASPODJELA KLASA U CIJELOM DATASETU
+---------------------------------------------------------------------------
+ Decision_Class  count  percentage
+              0    564       59.06
+              1    391       40.94
+
+4. RASPODJELA KLASA U TRENING SKUPU
+---------------------------------------------------------------------------
+ Decision_Class  count  percentage
+              0    451       59.03
+              1    313       40.97
+
+5. RASPODJELA KLASA U TESTNOM SKUPU
+---------------------------------------------------------------------------
+ Decision_Class  count  percentage
+              0    113       59.16
+              1     78       40.84
+
+6. USPOREDBA MODELA NA TRENING SKUPU
+---------------------------------------------------------------------------
+         model_name  best_balanced_accuracy_cv  accuracy_cv  precision_cv  recall_cv    f1_cv  roc_auc_cv  balanced_accuracy_std                                                                                                                     best_parameters
+      Random Forest                   0.961603     0.963347      0.958788   0.952023 0.955074    0.989333               0.005361 {"classifier__class_weight": null, "classifier__max_depth": 10, "classifier__min_samples_leaf": 1, "classifier__n_estimators": 200}
+Logistic Regression                   0.959419     0.960741      0.952822   0.952074 0.952054    0.991894               0.007161                                                                            {"classifier__C": 1.0, "classifier__class_weight": null}
+   Dummy Classifier                   0.500000     0.590316      0.000000   0.000000 0.000000    0.500000               0.000000                                                                                           {"classifier__strategy": "most_frequent"}
+
+7. ODABRANI MODEL
+---------------------------------------------------------------------------
+Naziv modela: Random Forest
+Najbolji CV balanced accuracy: 0.9616
+Najbolji hiperparametri:
+{
+    "classifier__class_weight": null,
+    "classifier__max_depth": 10,
+    "classifier__min_samples_leaf": 1,
+    "classifier__n_estimators": 200
+}
+
+8. METODOLOŠKA NAPOMENA
+---------------------------------------------------------------------------
+Podaci su podijeljeni stratificirano na trening i testni skup. Optimizacija hiperparametara i usporedba modela provedene su isključivo na trening skupu pomoću peterostruke stratificirane unakrsne validacije. Testni skup nije korišten tijekom odabira modela i ostavljen je za zasebnu završnu evaluaciju.

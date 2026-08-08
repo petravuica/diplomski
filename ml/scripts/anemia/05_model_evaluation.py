@@ -18,7 +18,7 @@ from sklearn.metrics import (
     precision_score,
     recall_score,
     roc_auc_score,
-    RocCurveDisplay,
+    RocCurveDisplay,    
 )
 
 
@@ -27,7 +27,7 @@ from sklearn.metrics import (
 # ---------------------------------------------------------
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-ML_DIR = SCRIPT_DIR.parent
+ML_DIR = SCRIPT_DIR.parents[1]
 
 PROCESSED_DATA_DIR = (
     ML_DIR

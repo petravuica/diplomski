@@ -1,0 +1,72 @@
+EDA IZVJEŠTAJ – ANEMIA DATASET
+==================================================
+
+1. OSNOVNE INFORMACIJE
+--------------------------------------------------
+Broj redaka: 1004
+Broj stupaca: 9
+Broj duplikata: 27
+Ukupan broj nedostajućih vrijednosti: 1
+
+Nazivi stupaca:
+- Gender
+- Age
+- HGB
+- RBC
+- HCT
+- MCV
+- MCH
+- MCHC
+- Decision_Class
+
+2. TIPOVI PODATAKA
+--------------------------------------------------
+Gender                str
+Age               float64
+HGB               float64
+RBC               float64
+HCT               float64
+MCV               float64
+MCH               float64
+MCHC              float64
+Decision_Class      int64
+
+3. NEDOSTAJUĆE VRIJEDNOSTI
+--------------------------------------------------
+Gender            0
+Age               0
+HGB               0
+RBC               0
+HCT               1
+MCV               0
+MCH               0
+MCHC              0
+Decision_Class    0
+
+4. RASPODJELA CILJNE VARIJABLE
+--------------------------------------------------
+Decision_Class
+0    574
+1    430
+
+5. RASPODJELA SPOLA
+--------------------------------------------------
+Gender
+F     531
+M     471
+ F      2
+
+6. DESKRIPTIVNA STATISTIKA
+--------------------------------------------------
+       Gender          Age          HGB          RBC          HCT          MCV          MCH         MCHC  Decision_Class
+count    1004  1004.000000  1004.000000  1004.000000  1003.000000  1004.000000  1004.000000  1004.000000     1004.000000
+unique      3          NaN          NaN          NaN          NaN          NaN          NaN          NaN             NaN
+top         F          NaN          NaN          NaN          NaN          NaN          NaN          NaN             NaN
+freq      531          NaN          NaN          NaN          NaN          NaN          NaN          NaN             NaN
+mean      NaN    43.784761    11.626574     4.338098    35.490429    81.972809    26.949104    32.792629        0.428287
+std       NaN    21.515327     2.429586     0.899898     7.165569     8.627206     3.810652     2.462704        0.495077
+min       NaN     0.100000     3.500000     0.980000    10.400000    53.600000    14.600000    25.700000        0.000000
+25%       NaN    26.000000     9.900000     3.770000    30.600000    77.500000    25.275000    31.900000        0.000000
+50%       NaN    45.000000    11.600000     4.360000    35.500000    83.000000    27.400000    32.800000        0.000000
+75%       NaN    61.250000    13.300000     4.912500    40.300000    87.000000    29.000000    33.700000        1.000000
+max       NaN    90.000000    21.400000     9.420000    64.400000   141.000000    82.700000    94.800000        1.000000

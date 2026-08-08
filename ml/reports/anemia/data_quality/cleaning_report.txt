@@ -47,7 +47,7 @@ M    453
 Nedostajuće vrijednosti: 0
 Duplikati: 0
 Vrijednosti spola: ['F', 'M']
-Ciljne klase: [0, 1]
+Ciljne klase: [np.int64(0), np.int64(1)]
 
 8. METODOLOŠKA NAPOMENA
 ----------------------------------------------------------------------

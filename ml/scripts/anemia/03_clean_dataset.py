@@ -8,7 +8,7 @@ import pandas as pd
 # ---------------------------------------------------------
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-ML_DIR = SCRIPT_DIR.parent
+ML_DIR = SCRIPT_DIR.parents[1]
 
 RAW_DATASET_PATH = ML_DIR / "data" / "raw" / "anemia_raw.xlsx"
 PROCESSED_DATA_DIR = ML_DIR / "data" / "processed"

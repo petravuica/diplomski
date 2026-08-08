@@ -14,7 +14,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 
 # Glavna ML mapa:
 # blood_analysis/ml/
-ML_DIR = SCRIPT_DIR.parent
+ML_DIR = SCRIPT_DIR.parents[1]
 
 # Ulazni dataset
 DATASET_PATH = ML_DIR / "data" / "raw" / "anemia_raw.xlsx"

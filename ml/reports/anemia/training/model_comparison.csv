@@ -1,0 +1,4 @@
+﻿model_name,best_balanced_accuracy_cv,accuracy_cv,precision_cv,recall_cv,f1_cv,roc_auc_cv,balanced_accuracy_std,best_parameters
+Random Forest,0.9616034503131278,0.9633470932232543,0.9587878452572488,0.9520225294418843,0.9550735648971298,0.9893325412142616,0.005361331487327008,"{""classifier__class_weight"": null, ""classifier__max_depth"": 10, ""classifier__min_samples_leaf"": 1, ""classifier__n_estimators"": 200}"
+Logistic Regression,0.9594190397416202,0.9607413140694874,0.9528222907036467,0.952073732718894,0.9520540538133948,0.9918942586684523,0.007161164381333917,"{""classifier__C"": 1.0, ""classifier__class_weight"": null}"
+Dummy Classifier,0.5,0.5903164774681803,0.0,0.0,0.0,0.5,0.0,"{""classifier__strategy"": ""most_frequent""}"

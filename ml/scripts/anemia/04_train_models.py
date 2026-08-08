@@ -23,7 +23,7 @@ from sklearn.metrics import make_scorer, precision_score
 # ---------------------------------------------------------
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-ML_DIR = SCRIPT_DIR.parent
+ML_DIR = SCRIPT_DIR.parents[1]
 
 CLEAN_DATASET_PATH = (
     ML_DIR

@@ -5,11 +5,13 @@ import joblib
 import pandas as pd
 from django.conf import settings
 
+BASE_DIR = Path(__file__).resolve().parents[2]
 
 MODEL_PATH = (
-    Path(settings.BASE_DIR)
+    BASE_DIR
     / "ml"
     / "models"
+    / "anemia"
     / "best_anemia_model.joblib"
 )
 
