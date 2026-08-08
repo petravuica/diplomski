@@ -1,0 +1,56 @@
+ZAVRŠNA EVALUACIJA MODELA – INDIAN LIVER PATIENT DATASET
+===============================================================================================
+
+1. OSNOVNE INFORMACIJE
+-----------------------------------------------------------------------------------------------
+Broj testnih zapisa: 114
+Testni skup korišten je prvi put u ovoj evaluaciji.
+Klasa 1: jetreni pacijent
+Klasa 0: osoba bez oznake jetrene bolesti
+Glavna metrika: balanced accuracy
+
+2. REZULTATI MODELA NA TESTNOM SKUPU
+-----------------------------------------------------------------------------------------------
+         model_name  accuracy_test  balanced_accuracy_test  precision_class_1_test  recall_class_1_test  f1_class_1_test  precision_class_0_test  recall_class_0_test  f1_class_0_test  specificity_test  negative_predictive_value_test  roc_auc_test  true_negative  false_positive  false_negative  true_positive
+Logistic Regression       0.684211                0.732884                0.909091             0.617284         0.735294                0.474576             0.848485         0.608696          0.848485                        0.474576      0.787505             28               5              31             50
+      Random Forest       0.701754                0.700337                0.850746             0.703704         0.770270                0.489362             0.696970         0.575000          0.696970                        0.489362      0.768425             23              10              24             57
+   Dummy Classifier       0.710526                0.500000                0.710526             1.000000         0.830769                0.000000             0.000000         0.000000          0.000000                        0.000000      0.500000              0              33               0             81
+
+3. USPOREDBA CV I TESTNIH REZULTATA
+-----------------------------------------------------------------------------------------------
+         model_name  best_balanced_accuracy_cv  balanced_accuracy_test  balanced_accuracy_difference    f1_cv  f1_class_1_test  f1_class_1_difference  roc_auc_cv  roc_auc_test  roc_auc_difference  recall_class_0_test  recall_class_1_test
+Logistic Regression                   0.687146                0.732884                      0.045739 0.656885         0.735294               0.078409    0.742761      0.787505            0.044744             0.848485             0.617284
+      Random Forest                   0.689379                0.700337                      0.010957 0.744848         0.770270               0.025422    0.732550      0.768425            0.035875             0.696970             0.703704
+   Dummy Classifier                   0.500000                0.500000                      0.000000 0.830962         0.830769              -0.000193    0.500000      0.500000            0.000000             0.000000             1.000000
+
+4. MODEL ODABRAN TIJEKOM TRENINGA
+-----------------------------------------------------------------------------------------------
+Naziv modela: Random Forest
+Test accuracy: 0.7018
+Test balanced accuracy: 0.7003
+Precision klase 1: 0.8507
+Recall klase 1 / osjetljivost: 0.7037
+F1 klase 1: 0.7703
+Precision klase 0: 0.4894
+Recall klase 0 / specifičnost: 0.6970
+F1 klase 0: 0.5750
+ROC AUC: 0.7684
+True negative: 23
+False positive: 10
+False negative: 24
+True positive: 57
+
+5. CLASSIFICATION REPORT ODABRANOG MODELA
+-----------------------------------------------------------------------------------------------
+                              precision    recall  f1-score   support
+
+Klasa 0 – bez oznake bolesti     0.4894    0.6970    0.5750        33
+  Klasa 1 – jetreni pacijent     0.8507    0.7037    0.7703        81
+
+                    accuracy                         0.7018       114
+                   macro avg     0.6701    0.7003    0.6726       114
+                weighted avg     0.7461    0.7018    0.7137       114
+
+6. METODOLOŠKA NAPOMENA
+-----------------------------------------------------------------------------------------------
+Završna evaluacija provedena je na prethodno izdvojenom testnom skupu koji nije korišten tijekom treniranja, optimizacije hiperparametara ni odabira modela. Službeni model ostaje model odabran prema prosječnoj balanced accuracy vrijednosti iz unakrsne validacije. Rezultat testnog skupa koristi se kao neovisna procjena sposobnosti generalizacije, a ne za naknadni odabir povoljnijeg modela.

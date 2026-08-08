@@ -2,142 +2,249 @@
 {% block title %}Krvni nalaz | BloodLab AI{% endblock %}
 
 {% block content %}
-<section class="profile-hero">
-    <div class="container app-container detail-hero-row">
-        <div>
-            <span class="eyebrow">Analizirani nalaz</span>
-            <h1>Krvni nalaz od {{ blood_test.sampling_date|date:"d.m.Y." }}</h1>
-            <p>Ručni unos · {{ blood_test.results.count }} spremljenih parametara</p>
-        </div>
-        <div class="detail-hero-actions">
-            <a class="btn btn-secondary-app" href="{% url 'laboratory:history' %}">← Povijest nalaza</a>
-            <a class="btn btn-primary-app" href="{% url 'laboratory:manual-create' %}"><span class="btn-icon">＋</span> Novi nalaz</a>
-        </div>
-    </div>
-</section>
 
-<section class="profile-content">
-    <div class="container app-container">
-        <div class="detail-summary-grid analysis-summary-grid">
-            <article class="stat-card"><div class="stat-icon icon-green">✓</div><div><span>Uredno</span><strong>{{ analysis_summary.normal }}</strong></div></article>
-            <article class="stat-card"><div class="stat-icon icon-orange">↓</div><div><span>Sniženo</span><strong>{{ analysis_summary.low }}</strong></div></article>
-            <article class="stat-card"><div class="stat-icon icon-red">↑</div><div><span>Povišeno</span><strong>{{ analysis_summary.high }}</strong></div></article>
-            <article class="stat-card"><div class="stat-icon icon-gray">?</div><div><span>Bez intervala</span><strong>{{ analysis_summary.unknown }}</strong></div></article>
-        </div>
-
-        {% if anemia_prediction %}
-    <article class="panel-card mt-4">
-        <div class="panel-heading">
-            <div>
-                <span class="eyebrow">ML analiza</span>
-                <h2>Procjena pokazatelja anemije</h2>
+    {% if anemia_prediction %}
+        <article class="panel-card mt-4">
+            <div class="panel-heading">
+                <div>
+                    <span class="eyebrow">ML analiza</span>
+                    <h2>Procjena pokazatelja anemije</h2>
+                </div>
             </div>
-        </div>
 
-        <div class="anemia-prediction-card
-            {% if anemia_prediction.prediction == 1 %}
-                anemia-positive
-            {% else %}
-                anemia-negative
-            {% endif %}
-        ">
-            <div class="anemia-prediction-icon">
+            <div class="anemia-prediction-card
                 {% if anemia_prediction.prediction == 1 %}
-                    !
+                    anemia-positive
                 {% else %}
-                    ✓
+                    anemia-negative
                 {% endif %}
-            </div>
-
-            <div class="anemia-prediction-content">
-                <h3>{{ anemia_prediction.label }}</h3>
-
-                <p>
-                    Model procjenjuje vjerojatnost prisutnosti pokazatelja anemije na
-                    <strong>{{ anemia_prediction.anemia_probability_percent }} %</strong>.
-                </p>
-
-                <div class="prediction-probability">
-                    <span>Vjerojatnost anemije</span>
-                    <strong>{{ anemia_prediction.anemia_probability_percent }} %</strong>
+            ">
+                <div class="anemia-prediction-icon">
+                    {% if anemia_prediction.prediction == 1 %}
+                        !
+                    {% else %}
+                        ✓
+                    {% endif %}
                 </div>
 
-                <div class="prediction-progress">
-                    <div
-                        class="prediction-progress-value"
-                        style="width: {{ anemia_prediction.anemia_probability_percent }} %;">
+                <div class="anemia-prediction-content">
+                    <h3>{{ anemia_prediction.label }}</h3>
+
+                    <p>
+                        Model procjenjuje vjerojatnost prisutnosti pokazatelja anemije na
+                        <strong>{{ anemia_prediction.anemia_probability_percent }} %</strong>.
+                    </p>
+
+                    <div class="prediction-probability">
+                        <span>Vjerojatnost anemije</span>
+                        <strong>{{ anemia_prediction.anemia_probability_percent }} %</strong>
+                    </div>
+
+                    <div class="prediction-progress">
+                        <div
+                            class="prediction-progress-value"
+                            style="width: {{ anemia_prediction.anemia_probability_percent }}%;">
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <p class="prediction-disclaimer">
+                Rezultat je generiran modelom strojnog učenja na temelju dobi, spola,
+                hemoglobina, eritrocita, hematokrita, MCV-a, MCH-a i MCHC-a.
+                Rezultat je informativan i ne predstavlja medicinsku dijagnozu.
+            </p>
+        </article>
+
+    {% elif anemia_prediction_message %}
+        <article class="panel-card info-card mt-4">
+            <div class="info-symbol">i</div>
+            <h3>ML procjena anemije nije dostupna</h3>
+            <p>{{ anemia_prediction_message }}</p>
+        </article>
+    {% endif %}
+
+
+    {% if liver_prediction %}
+        <article class="panel-card mt-4">
+            <div class="panel-heading">
+                <div>
+                    <span class="eyebrow">ML analiza</span>
+                    <h2>Analiza jetrenih parametara</h2>
+                </div>
+            </div>
+
+            <div class="anemia-prediction-card
+                {% if liver_prediction.prediction == 1 %}
+                    anemia-positive
+                {% else %}
+                    anemia-negative
+                {% endif %}
+            ">
+                <div class="anemia-prediction-icon">
+                    {% if liver_prediction.prediction == 1 %}
+                        !
+                    {% else %}
+                        ✓
+                    {% endif %}
+                </div>
+
+                <div class="anemia-prediction-content">
+                    <h3>{{ liver_prediction.label }}</h3>
+
+                    <p>
+                        Model procjenjuje vjerojatnost obrasca povezanog s odstupanjem
+                        jetrenih parametara na
+                        <strong>{{ liver_prediction.liver_probability_percent }} %</strong>.
+                    </p>
+
+                    <div class="prediction-probability">
+                        <span>Vjerojatnost jetrenog odstupanja</span>
+                        <strong>{{ liver_prediction.liver_probability_percent }} %</strong>
+                    </div>
+
+                    <div class="prediction-progress">
+                        <div
+                            class="prediction-progress-value"
+                            style="width: {{ liver_prediction.liver_probability_percent }}%;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="prediction-disclaimer">
+                Rezultat je generiran modelom strojnog učenja na temelju dobi, spola,
+                ukupnog bilirubina, ALP-a, ALT-a, AST-a, ukupnih proteina i albumina.
+                Rezultat je informativan i ne predstavlja medicinsku dijagnozu.
+            </p>
+        </article>
+
+    {% elif liver_prediction_message %}
+        <article class="panel-card info-card mt-4">
+            <div class="info-symbol">i</div>
+            <h3>ML analiza jetrenih parametara nije dostupna</h3>
+            <p>{{ liver_prediction_message }}</p>
+            <p>
+                Dostupni laboratorijski parametri i dalje su analizirani prema
+                referentnim intervalima.
+            </p>
+        </article>
+    {% endif %}
+
+
+    <article class="panel-card mt-4">
+        <div class="panel-heading">
+            <div>
+                <span class="eyebrow">Rezultati</span>
+                <h2>Laboratorijske vrijednosti</h2>
+            </div>
+
+            <div class="test-meta">
+                Dob pri nalazu:
+                <strong>{{ blood_test.age_at_test|default:"—" }}</strong>
+            </div>
         </div>
 
-        <p class="prediction-disclaimer">
-            Rezultat je generiran modelom strojnog učenja na temelju dobi, spola,
-            hemoglobina, eritrocita, hematokrita, MCV-a, MCH-a i MCHC-a.
-            Rezultat je informativan i ne predstavlja medicinsku dijagnozu.
+        <div class="parameter-table-wrap">
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Parametar</th>
+                        <th>Vrijednost</th>
+                        <th>Jedinica</th>
+                        <th>Referentni interval</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for result in blood_test.results.all %}
+                        <tr class="result-row-{{ result.status }}">
+                            <td>
+                                <strong>{{ result.parameter_name }}</strong>
+                                <small>{{ result.parameter_code }}</small>
+                            </td>
+
+                            <td>
+                                {{ result.display_value }}
+                            </td>
+
+                            <td>
+                                {{ result.unit|default:"—" }}
+                            </td>
+
+                            <td>
+                                {% if result.reference_min != None and result.reference_max != None %}
+                                    {{ result.reference_min|floatformat:"-6" }} –
+                                    {{ result.reference_max|floatformat:"-6" }}
+
+                                {% elif result.reference_min != None %}
+                                    ≥ {{ result.reference_min|floatformat:"-6" }}
+
+                                {% elif result.reference_max != None %}
+                                    ≤ {{ result.reference_max|floatformat:"-6" }}
+
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if result.status == 'normal' %}
+                                    <span class="result-status status-normal">
+                                        Uredno
+                                    </span>
+
+                                {% elif result.status == 'low' %}
+                                    <span class="result-status status-low">
+                                        Sniženo
+                                    </span>
+
+                                {% elif result.status == 'high' %}
+                                    <span class="result-status status-high">
+                                        Povišeno
+                                    </span>
+
+                                {% else %}
+                                    <span class="result-status status-unknown">
+                                        Nije moguće analizirati
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                    {% empty %}
+                        <tr>
+                            <td colspan="5">
+                                Nema spremljenih parametara.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </article>
+
+    <div class="detail-bottom-actions">
+        <a
+            class="history-delete-link"
+            href="{% url 'laboratory:delete' blood_test.pk %}"
+        >
+            Obriši ovaj nalaz
+        </a>
+    </div>
+
+    <article class="panel-card info-card mt-4">
+        <div class="info-symbol">i</div>
+
+        <h3>Kako se određuje status rezultata?</h3>
+
+        <p>
+            Vrijednost se uspoređuje isključivo s referentnim granicama
+            unesenima s laboratorijskog nalaza. Rezultat bez referentnog
+            intervala označen je kao nepoznat. Ovaj prikaz je informativan
+            i ne predstavlja dijagnozu.
         </p>
     </article>
 
-{% elif anemia_prediction_message %}
-    <article class="panel-card info-card mt-4">
-        <div class="info-symbol">i</div>
-        <h3>ML procjena anemije nije dostupna</h3>
-        <p>{{ anemia_prediction_message }}</p>
-    </article>
-{% endif %}
-
-        <article class="panel-card mt-4">
-            <div class="panel-heading">
-                <div><span class="eyebrow">Rezultati</span><h2>Laboratorijske vrijednosti</h2></div>
-                <div class="test-meta">Dob pri nalazu: <strong>{{ blood_test.age_at_test|default:"—" }}</strong></div>
-            </div>
-            <div class="parameter-table-wrap">
-                <table class="results-table">
-                    <thead><tr><th>Parametar</th><th>Vrijednost</th><th>Jedinica</th><th>Referentni interval</th><th>Status</th></tr></thead>
-                    <tbody>
-                        {% for result in blood_test.results.all %}
-                            <tr class="result-row-{{ result.status }}">
-                                <td><strong>{{ result.parameter_name }}</strong><small>{{ result.parameter_code }}</small></td>
-                                <td>{{ result.display_value }}</td>
-                                <td>{{ result.unit|default:"—" }}</td>
-                                <td>
-                                    {% if result.reference_min != None and result.reference_max != None %}
-                                        {{ result.reference_min|floatformat:"-6" }} – {{ result.reference_max|floatformat:"-6" }}
-                                    {% elif result.reference_min != None %}
-                                        ≥ {{ result.reference_min|floatformat:"-6" }}
-                                    {% elif result.reference_max != None %}
-                                        ≤ {{ result.reference_max|floatformat:"-6" }}
-                                    {% else %}—{% endif %}
-                                </td>
-                                <td>
-                                    {% if result.status == 'normal' %}
-                                        <span class="result-status status-normal">Uredno</span>
-                                    {% elif result.status == 'low' %}
-                                        <span class="result-status status-low">Sniženo</span>
-                                    {% elif result.status == 'high' %}
-                                        <span class="result-status status-high">Povišeno</span>
-                                    {% else %}
-                                        <span class="result-status status-unknown">Nije moguće analizirati</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% empty %}
-                            <tr><td colspan="5">Nema spremljenih parametara.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </article>
-
-        <div class="detail-bottom-actions">
-            <a class="history-delete-link" href="{% url 'laboratory:delete' blood_test.pk %}">Obriši ovaj nalaz</a>
-        </div>
-
-        <article class="panel-card info-card mt-4">
-            <div class="info-symbol">i</div>
-            <h3>Kako se određuje status rezultata?</h3>
-            <p>Vrijednost se uspoređuje isključivo s referentnim granicama unesenima s laboratorijskog nalaza. Rezultat bez referentnog intervala označen je kao nepoznat. Ovaj prikaz je informativan i ne predstavlja dijagnozu.</p>
-        </article>
-    </div>
-</section>
 {% endblock %}

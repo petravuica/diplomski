@@ -20,6 +20,7 @@ from .models import BloodTest, BloodTestResult
 from .pdf_parser import LaboratoryPdfParser, PdfParsingError
 from .services import ReferenceAnalysisService
 from .ml_services.anemia_prediction import predict_anemia
+from .ml_services.liver_prediction import predict_liver
 
 
 @login_required
@@ -434,10 +435,24 @@ def blood_test_detail(request, pk):
         blood_test
     )
 
+    # ---------------------------------------------------------
+    # PRIPREMA REZULTATA
+    # ---------------------------------------------------------
+
+    result_values = {
+        result.parameter_code.strip().upper(): result.numeric_value
+        for result in blood_test.results.all()
+        if result.numeric_value is not None
+    }
+
+    # ---------------------------------------------------------
+    # ANEMIA ML PREDIKCIJA
+    # ---------------------------------------------------------
+
     anemia_prediction = None
     anemia_prediction_message = None
 
-    required_parameters = {
+    anemia_required_parameters = {
         "RBC",
         "HGB",
         "HCT",
@@ -446,20 +461,14 @@ def blood_test_detail(request, pk):
         "MCHC",
     }
 
-    result_values = {
-        result.parameter_code.strip().upper(): result.numeric_value
-        for result in blood_test.results.all()
-        if result.numeric_value is not None
-    }
-
-    missing_parameters = sorted(
-        required_parameters - result_values.keys()
+    anemia_missing_parameters = sorted(
+        anemia_required_parameters - result_values.keys()
     )
 
-    if missing_parameters:
+    if anemia_missing_parameters:
         anemia_prediction_message = (
             "Predikcija anemije nije dostupna jer nedostaju parametri: "
-            + ", ".join(missing_parameters)
+            + ", ".join(anemia_missing_parameters)
             + "."
         )
 
@@ -487,12 +496,129 @@ def blood_test_detail(request, pk):
                 mch=result_values["MCH"],
                 mchc=result_values["MCHC"],
             )
+
         except (ValueError, FileNotFoundError) as exc:
             anemia_prediction_message = str(exc)
+
         except Exception:
             anemia_prediction_message = (
                 "Predikciju anemije trenutačno nije moguće izračunati."
             )
+
+    # ---------------------------------------------------------
+    # JETRENI ML MODEL
+    # ---------------------------------------------------------
+
+    liver_prediction = None
+    liver_prediction_message = None
+
+    # Konačni practical model koristi:
+    # Gender
+    # Age
+    # Total Bilirubin
+    # ALP
+    # ALT
+    # AST
+    # Total Proteins
+    # Albumin
+
+    liver_parameter_codes = {
+        "Total_Bilirubin": ("BILI", "TBIL", "BIL"),
+        "Alkaline_Phosphatase": ("ALP", "AP"),
+        "Alanine_Aminotransferase": ("ALT",),
+        "Aspartate_Aminotransferase": ("AST",),
+        "Total_Proteins": ("TP", "PROT"),
+        "Albumin": ("ALB", "ALBUMIN"),
+    }
+
+    def get_result_value(possible_codes):
+        for code in possible_codes:
+            value = result_values.get(code)
+
+            if value is not None:
+                return value
+
+        return None
+
+    liver_values = {
+        parameter_name: get_result_value(possible_codes)
+        for parameter_name, possible_codes
+        in liver_parameter_codes.items()
+    }
+
+    liver_missing_parameters = [
+        parameter_name
+        for parameter_name, value in liver_values.items()
+        if value is None
+    ]
+
+    if liver_missing_parameters:
+        readable_names = {
+            "Total_Bilirubin": "ukupni bilirubin",
+            "Alkaline_Phosphatase": "ALP",
+            "Alanine_Aminotransferase": "ALT",
+            "Aspartate_Aminotransferase": "AST",
+            "Total_Proteins": "ukupni proteini",
+            "Albumin": "albumin",
+        }
+
+        missing_names = [
+            readable_names[name]
+            for name in liver_missing_parameters
+        ]
+
+        liver_prediction_message = (
+            "ML analiza jetrenih parametara nije dostupna jer "
+            "nedostaju parametri: "
+            + ", ".join(missing_names)
+            + "."
+        )
+
+    elif blood_test.age_at_test is None:
+        liver_prediction_message = (
+            "ML analiza jetrenih parametara nije dostupna jer "
+            "nije spremljena dob korisnika u trenutku nalaza."
+        )
+
+    elif blood_test.gender_at_test not in {"female", "male"}:
+        liver_prediction_message = (
+            "ML analiza jetrenih parametara trenutačno je dostupna "
+            "samo za ženski ili muški spol."
+        )
+
+    else:
+        try:
+            liver_prediction = predict_liver(
+                gender=blood_test.gender_at_test,
+                age=blood_test.age_at_test,
+                total_bilirubin=liver_values["Total_Bilirubin"],
+                alkaline_phosphatase=liver_values[
+                    "Alkaline_Phosphatase"
+                ],
+                alt=liver_values[
+                    "Alanine_Aminotransferase"
+                ],
+                ast=liver_values[
+                    "Aspartate_Aminotransferase"
+                ],
+                total_proteins=liver_values[
+                    "Total_Proteins"
+                ],
+                albumin=liver_values["Albumin"],
+            )
+
+        except (ValueError, FileNotFoundError) as exc:
+            liver_prediction_message = str(exc)
+
+        except Exception:
+            liver_prediction_message = (
+                "ML analizu jetrenih parametara trenutačno "
+                "nije moguće izračunati."
+            )
+
+    # ---------------------------------------------------------
+    # TEMPLATE
+    # ---------------------------------------------------------
 
     return render(
         request,
@@ -500,8 +626,12 @@ def blood_test_detail(request, pk):
         {
             "blood_test": blood_test,
             "analysis_summary": analysis_summary,
+
             "anemia_prediction": anemia_prediction,
             "anemia_prediction_message": anemia_prediction_message,
+
+            "liver_prediction": liver_prediction,
+            "liver_prediction_message": liver_prediction_message,
         },
     )
 

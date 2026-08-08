@@ -1,0 +1,35 @@
+{
+    "created_at_utc": "2026-08-04T08:20:28.951158+00:00",
+    "dataset_path": "C:\\Users\\ACER\\DIPLOMSKI\\blood_analysis\\ml\\data\\processed\\liver\\liver_dataset_clean.csv",
+    "total_rows": 567,
+    "training_rows": 453,
+    "test_rows": 114,
+    "test_size": 0.2,
+    "random_state": 42,
+    "cross_validation_folds": 5,
+    "selection_metric": "balanced_accuracy",
+    "feature_columns": [
+        "Gender",
+        "Age",
+        "Total_Bilirubin",
+        "Direct_Bilirubin",
+        "Alkaline_Phosphatase",
+        "Alanine_Aminotransferase",
+        "Aspartate_Aminotransferase",
+        "Total_Proteins",
+        "Albumin",
+        "Albumin_and_Globulin_Ratio"
+    ],
+    "target_column": "Liver_Disease",
+    "positive_class": 1,
+    "negative_class": 0,
+    "best_model_name": "Random Forest",
+    "best_cv_balanced_accuracy": 0.6893794515669516,
+    "best_parameters": {
+        "classifier__class_weight": "balanced",
+        "classifier__max_depth": 8,
+        "classifier__min_samples_leaf": 5,
+        "classifier__n_estimators": 400
+    },
+    "test_set_evaluated": false
+}

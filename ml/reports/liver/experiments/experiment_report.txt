@@ -1,0 +1,39 @@
+DODATNI EKSPERIMENTI – INDIAN LIVER PATIENT DATASET
+===============================================================================================
+
+1. METODOLOGIJA
+-----------------------------------------------------------------------------------------------
+Broj trening zapisa: 453
+Broj podjela: 5
+Broj ponavljanja: 5
+Ukupan broj validacijskih podjela po kombinaciji: 25
+Glavna metrika: balanced accuracy
+Testni skup nije učitan niti korišten.
+
+2. RASPODJELA KLASA U TRENING SKUPU
+-----------------------------------------------------------------------------------------------
+ Liver_Disease  count  percentage
+             0    131       28.92
+             1    322       71.08
+
+3. USPOREDBA MODELA
+-----------------------------------------------------------------------------------------------
+         model_name  balanced_accuracy_mean  balanced_accuracy_std  accuracy_mean  recall_class_0_mean  recall_class_1_mean  precision_class_1_mean  f1_macro_mean  roc_auc_mean  roc_auc_std                                                                                                                          best_parameters
+Logistic Regression                0.694275               0.027438       0.624327             0.859772             0.528779                0.907261       0.616915      0.739990     0.040789                                                                           {"classifier__C": 0.1, "classifier__class_weight": "balanced"}
+      Random Forest                0.687684               0.046177       0.679018             0.708205             0.667163                0.851190       0.652913      0.731524     0.046204 {"classifier__class_weight": "balanced", "classifier__max_depth": 8, "classifier__min_samples_leaf": 3, "classifier__n_estimators": 400}
+            SVM RBF                0.685228               0.027863       0.611492             0.859658             0.510798                0.902551       0.605152      0.734327     0.030810                                                 {"classifier__C": 1.0, "classifier__class_weight": "balanced", "classifier__gamma": 0.1}
+  Gradient Boosting                0.584385               0.049441       0.704576             0.299202             0.869567                0.754105       0.584430      0.719182     0.042490       {"classifier__learning_rate": 0.1, "classifier__max_depth": 2, "classifier__min_samples_leaf": 3, "classifier__n_estimators": 100}
+
+4. NAJBOLJI EKSPERIMENTALNI MODEL
+-----------------------------------------------------------------------------------------------
+Naziv: Logistic Regression
+Repeated-CV balanced accuracy: 0.6943
+Najbolji hiperparametri:
+{
+    "classifier__C": 0.1,
+    "classifier__class_weight": "balanced"
+}
+
+5. NAPOMENA
+-----------------------------------------------------------------------------------------------
+Eksperiment je proveden isključivo na prethodno izdvojenom trening skupu. Postojeći testni skup nije ponovno korišten. Eksperimentalni model spremljen je odvojeno i ne prepisuje službeni model iz prve faze treniranja.

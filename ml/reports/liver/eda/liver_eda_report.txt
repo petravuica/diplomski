@@ -1,0 +1,77 @@
+EDA IZVJEŠTAJ – INDIAN LIVER PATIENT DATASET
+======================================================================
+
+1. OSNOVNE INFORMACIJE
+----------------------------------------------------------------------
+Broj redaka: 583
+Broj stupaca: 11
+Broj potpunih duplikata: 13
+Ukupan broj nedostajućih vrijednosti: 4
+
+Nazivi stupaca:
+- Age
+- Gender
+- Total_Bilirubin
+- Direct_Bilirubin
+- Alkaline_Phosphotase
+- Alamine_Aminotransferase
+- Aspartate_Aminotransferase
+- Total_Protiens
+- Albumin
+- Albumin_and_Globulin_Ratio
+- Dataset
+
+2. TIPOVI PODATAKA
+----------------------------------------------------------------------
+Age                             int64
+Gender                            str
+Total_Bilirubin               float64
+Direct_Bilirubin              float64
+Alkaline_Phosphotase            int64
+Alamine_Aminotransferase        int64
+Aspartate_Aminotransferase      int64
+Total_Protiens                float64
+Albumin                       float64
+Albumin_and_Globulin_Ratio    float64
+Dataset                         int64
+
+3. NEDOSTAJUĆE VRIJEDNOSTI
+----------------------------------------------------------------------
+Age                           0
+Gender                        0
+Total_Bilirubin               0
+Direct_Bilirubin              0
+Alkaline_Phosphotase          0
+Alamine_Aminotransferase      0
+Aspartate_Aminotransferase    0
+Total_Protiens                0
+Albumin                       0
+Albumin_and_Globulin_Ratio    4
+Dataset                       0
+
+4. RASPODJELA CILJNE VARIJABLE
+----------------------------------------------------------------------
+Dataset
+1    416
+2    167
+
+5. RASPODJELA SPOLA
+----------------------------------------------------------------------
+Gender
+Male      441
+Female    142
+
+6. DESKRIPTIVNA STATISTIKA
+----------------------------------------------------------------------
+               Age Gender  Total_Bilirubin  Direct_Bilirubin  Alkaline_Phosphotase  Alamine_Aminotransferase  Aspartate_Aminotransferase  Total_Protiens     Albumin  Albumin_and_Globulin_Ratio     Dataset
+count   583.000000    583       583.000000        583.000000            583.000000                583.000000                  583.000000      583.000000  583.000000                  579.000000  583.000000
+unique         NaN      2              NaN               NaN                   NaN                       NaN                         NaN             NaN         NaN                         NaN         NaN
+top            NaN   Male              NaN               NaN                   NaN                       NaN                         NaN             NaN         NaN                         NaN         NaN
+freq           NaN    441              NaN               NaN                   NaN                       NaN                         NaN             NaN         NaN                         NaN         NaN
+mean     44.746141    NaN         3.298799          1.486106            290.576329                 80.713551                  109.910806        6.483190    3.141852                    0.947064    1.286449
+std      16.189833    NaN         6.209522          2.808498            242.937989                182.620356                  288.918529        1.085451    0.795519                    0.319592    0.452490
+min       4.000000    NaN         0.400000          0.100000             63.000000                 10.000000                   10.000000        2.700000    0.900000                    0.300000    1.000000
+25%      33.000000    NaN         0.800000          0.200000            175.500000                 23.000000                   25.000000        5.800000    2.600000                    0.700000    1.000000
+50%      45.000000    NaN         1.000000          0.300000            208.000000                 35.000000                   42.000000        6.600000    3.100000                    0.930000    1.000000
+75%      58.000000    NaN         2.600000          1.300000            298.000000                 60.500000                   87.000000        7.200000    3.800000                    1.100000    2.000000
+max      90.000000    NaN        75.000000         19.700000           2110.000000               2000.000000                 4929.000000        9.600000    5.500000                    2.800000    2.000000

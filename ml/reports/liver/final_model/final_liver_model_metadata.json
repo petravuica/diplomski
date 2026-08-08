@@ -1,0 +1,24 @@
+{
+    "model_name": "Logistic Regression",
+    "model_purpose": "Informativna procjena obrasca povezanog s jetrenom bolešću",
+    "feature_set": "C_practical_8_features",
+    "feature_columns": [
+        "Gender",
+        "Age",
+        "Total_Bilirubin",
+        "Alkaline_Phosphatase",
+        "Alanine_Aminotransferase",
+        "Aspartate_Aminotransferase",
+        "Total_Proteins",
+        "Albumin"
+    ],
+    "target_column": "Liver_Disease",
+    "positive_class": 1,
+    "negative_class": 0,
+    "training_rows": 453,
+    "hyperparameters": {
+        "C": 0.1,
+        "class_weight": "balanced",
+        "solver": "liblinear"
+    }
+}

@@ -1,0 +1,56 @@
+IZVJEŠTAJ O ČIŠĆENJU – INDIAN LIVER PATIENT DATASET
+================================================================================
+
+1. OSNOVNE INFORMACIJE
+--------------------------------------------------------------------------------
+Početni broj zapisa: 583
+Konačni broj zapisa: 567
+Ukupno uklonjeno zapisa: 16
+Postotak uklonjenih zapisa: 2.74%
+
+2. UKLANJANJE PO KORACIMA
+--------------------------------------------------------------------------------
+duplicates_removed: 13
+invalid_gender_rows_removed: 0
+invalid_target_rows_removed: 0
+missing_required_rows_removed: 0
+non_positive_rows_removed: 0
+bilirubin_inconsistent_rows_removed: 3
+remaining_missing_ag_ratio: 4
+final_row_count: 567
+
+3. IZVORNA RASPODJELA CILJNE VARIJABLE
+--------------------------------------------------------------------------------
+ value  count  percentage
+     1    416       71.36
+     2    167       28.64
+
+4. PREKODIRANJE CILJNE VARIJABLE
+--------------------------------------------------------------------------------
+Izvorna klasa 1 -> nova klasa 1 (jetreni pacijent)
+Izvorna klasa 2 -> nova klasa 0 (osoba bez oznake jetrene bolesti)
+
+5. RASPODJELA CILJNE VARIJABLE NAKON ČIŠĆENJA
+--------------------------------------------------------------------------------
+ value  count  percentage
+     0    164       28.92
+     1    403       71.08
+
+6. RASPODJELA SPOLA NAKON ČIŠĆENJA
+--------------------------------------------------------------------------------
+ value  count  percentage
+Female    139       24.51
+  Male    428       75.49
+
+7. ZAVRŠNA PROVJERA
+--------------------------------------------------------------------------------
+Duplikati: 0
+Nedostajuće A/G vrijednosti: 4
+Nedostajuće vrijednosti u ostalim stupcima: 0
+Vrijednosti spola: ['Female', 'Male']
+Ciljne klase: [0, 1]
+Zapisi s direktnim bilirubinom većim od ukupnog: 0
+
+8. METODOLOŠKA NAPOMENA
+--------------------------------------------------------------------------------
+Statistički outlieri nisu automatski uklanjani jer visoke vrijednosti bilirubina, jetrenih enzima i alkalne fosfataze mogu predstavljati stvarne patološke nalaze. Četiri zapisa s nedostajućim A/G omjerom zadržana su, a njihova će se vrijednost nadomjestiti medijanom isključivo unutar ML Pipelinea nakon podjele na trening i testni skup. Tako se izbjegava curenje podataka.

@@ -30,6 +30,18 @@ LABORATORY_PARAMETERS = (
             ("FE", "Željezo", "µmol/L"),
         ),
     },
+    {
+    "group": "Jetreni parametri",
+    "parameters": (
+        ("BILI", "Ukupni bilirubin", "µmol/L"),
+        ("ALP", "Alkalna fosfataza (ALP)", "U/L"),
+        ("ALT", "Alanin-aminotransferaza (ALT)", "U/L"),
+        ("AST", "Aspartat-aminotransferaza (AST)", "U/L"),
+        ("GGT", "Gama-glutamiltransferaza (GGT)", "U/L"),
+        ("PROT", "Ukupni proteini", "g/L"),
+        ("ALB", "Albumin", "g/L"),
+    ),
+},
 )
 
 

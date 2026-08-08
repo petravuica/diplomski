@@ -1,0 +1,22 @@
+{
+    "created_at_utc": "2026-08-04T08:42:00.314949+00:00",
+    "training_rows": 453,
+    "cv_splits": 5,
+    "cv_repeats": 5,
+    "total_validation_splits": 25,
+    "selection_metric": "balanced_accuracy",
+    "models_compared": [
+        "Logistic Regression",
+        "Random Forest",
+        "SVM RBF",
+        "Gradient Boosting"
+    ],
+    "best_model_name": "Logistic Regression",
+    "best_balanced_accuracy": 0.6942754629629629,
+    "best_parameters": {
+        "classifier__C": 0.1,
+        "classifier__class_weight": "balanced"
+    },
+    "test_dataset_loaded": false,
+    "official_model_overwritten": false
+}
